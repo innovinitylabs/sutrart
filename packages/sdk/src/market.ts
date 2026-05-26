@@ -67,7 +67,7 @@ export async function getNextListingId(
   });
 }
 
-export async function getValidListings(
+export async function getAllListings(
   publicClient: PublicClient,
   marketAddress: Address
 ): Promise<Listing[]> {
@@ -75,18 +75,31 @@ export async function getValidListings(
   const listings: Listing[] = [];
 
   for (let listingId = 1n; listingId < nextListingId; listingId++) {
-    const listing = await getListing(publicClient, marketAddress, listingId);
+    listings.push(await getListing(publicClient, marketAddress, listingId));
+  }
+
+  return listings;
+}
+
+export async function getValidListings(
+  publicClient: PublicClient,
+  marketAddress: Address
+): Promise<Listing[]> {
+  const listings = await getAllListings(publicClient, marketAddress);
+  const validListings: Listing[] = [];
+
+  for (const listing of listings) {
     if (!listing.active) {
       continue;
     }
 
-    const valid = await isListingValid(publicClient, marketAddress, listingId);
+    const valid = await isListingValid(publicClient, marketAddress, listing.listingId);
     if (valid) {
-      listings.push(listing);
+      validListings.push(listing);
     }
   }
 
-  return listings;
+  return validListings;
 }
 
 export type ProtocolFeeConfig = {

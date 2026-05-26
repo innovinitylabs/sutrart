@@ -9,7 +9,7 @@ export default function CreatorPage() {
         <div className="space-y-2">
           <h1 className="text-3xl font-semibold">Creator</h1>
           <p className="text-muted-foreground text-sm">
-            Deploy sovereign ERC721RT collections and mint from collections you own.
+            Manage ERC721RT collections, inventory, and listings from one chain-native dashboard.
           </p>
         </div>
         <CreatorPanel />
