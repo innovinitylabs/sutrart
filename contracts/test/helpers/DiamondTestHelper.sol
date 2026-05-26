@@ -1,41 +1,38 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {Script} from "forge-std/Script.sol";
-import {IDiamondCut} from "../src/diamond/interfaces/IDiamondCut.sol";
-import {IDiamondLoupe} from "../src/diamond/interfaces/IDiamondLoupe.sol";
-import {Diamond} from "../src/diamond/Diamond.sol";
-import {DiamondCutFacet} from "../src/diamond/facets/DiamondCutFacet.sol";
-import {DiamondLoupeFacet} from "../src/diamond/facets/DiamondLoupeFacet.sol";
-import {OwnershipFacet} from "../src/diamond/facets/OwnershipFacet.sol";
-import {ListingFacet} from "../src/facets/ListingFacet.sol";
-import {ProtocolConfigFacet} from "../src/facets/ProtocolConfigFacet.sol";
-import {SettlementFacet} from "../src/facets/SettlementFacet.sol";
-import {ViewFacet} from "../src/facets/ViewFacet.sol";
-import {ISutrartMarket} from "../src/interfaces/ISutrartMarket.sol";
-import {MockERC721} from "../src/MockERC721.sol";
-import {SutrartInit} from "../src/SutrartInit.sol";
+import {Test} from "forge-std/Test.sol";
+import {IDiamondCut} from "../../src/diamond/interfaces/IDiamondCut.sol";
+import {IDiamondLoupe} from "../../src/diamond/interfaces/IDiamondLoupe.sol";
+import {Diamond} from "../../src/diamond/Diamond.sol";
+import {DiamondCutFacet} from "../../src/diamond/facets/DiamondCutFacet.sol";
+import {DiamondLoupeFacet} from "../../src/diamond/facets/DiamondLoupeFacet.sol";
+import {OwnershipFacet} from "../../src/diamond/facets/OwnershipFacet.sol";
+import {ListingFacet} from "../../src/facets/ListingFacet.sol";
+import {ProtocolConfigFacet} from "../../src/facets/ProtocolConfigFacet.sol";
+import {SettlementFacet} from "../../src/facets/SettlementFacet.sol";
+import {ViewFacet} from "../../src/facets/ViewFacet.sol";
+import {ISutrartMarket} from "../../src/interfaces/ISutrartMarket.sol";
+import {SutrartInit} from "../../src/SutrartInit.sol";
 
-contract DeployLocal is Script {
-    function run() external {
-        vm.startBroadcast();
-
-        MockERC721 nft = new MockERC721();
-        Diamond market = _deploySutrartDiamond(msg.sender);
-
-        vm.stopBroadcast();
-
-        string memory obj = "deployment";
-        vm.serializeUint(obj, "chainId", block.chainid);
-        vm.serializeAddress(obj, "MockERC721", address(nft));
-        string memory json = vm.serializeAddress(obj, "SutrartMarket", address(market));
-
-        vm.writeJson(json, "../packages/shared/src/deployments/local.json");
+abstract contract DiamondTestHelper is Test {
+    struct SutrartDiamondDeployment {
+        Diamond diamond;
+        ISutrartMarket market;
+        IDiamondLoupe loupe;
+        address diamondCutFacet;
+        address diamondLoupeFacet;
+        address ownershipFacet;
+        address listingFacet;
+        address settlementFacet;
+        address protocolConfigFacet;
+        address viewFacet;
     }
 
-    function _deploySutrartDiamond(address owner) internal returns (Diamond diamond) {
+    function _deploySutrartDiamond(address owner) internal returns (SutrartDiamondDeployment memory deployment) {
         DiamondCutFacet diamondCutFacet = new DiamondCutFacet();
-        diamond = new Diamond(owner, address(diamondCutFacet));
+        deployment.diamond = new Diamond(owner, address(diamondCutFacet));
+        deployment.diamondCutFacet = address(diamondCutFacet);
 
         DiamondLoupeFacet diamondLoupeFacet = new DiamondLoupeFacet();
         OwnershipFacet ownershipFacet = new OwnershipFacet();
@@ -44,6 +41,13 @@ contract DeployLocal is Script {
         ProtocolConfigFacet protocolConfigFacet = new ProtocolConfigFacet();
         ViewFacet viewFacet = new ViewFacet();
         SutrartInit init = new SutrartInit();
+
+        deployment.diamondLoupeFacet = address(diamondLoupeFacet);
+        deployment.ownershipFacet = address(ownershipFacet);
+        deployment.listingFacet = address(listingFacet);
+        deployment.settlementFacet = address(settlementFacet);
+        deployment.protocolConfigFacet = address(protocolConfigFacet);
+        deployment.viewFacet = address(viewFacet);
 
         IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](6);
         cut[0] = _facetCut(address(diamondLoupeFacet), _diamondLoupeSelectors());
@@ -54,7 +58,10 @@ contract DeployLocal is Script {
         cut[5] = _facetCut(address(viewFacet), _viewSelectors());
 
         bytes memory initCalldata = abi.encodeWithSelector(SutrartInit.init.selector, owner);
-        IDiamondCut(address(diamond)).diamondCut(cut, address(init), initCalldata);
+        IDiamondCut(address(deployment.diamond)).diamondCut(cut, address(init), initCalldata);
+
+        deployment.market = ISutrartMarket(address(deployment.diamond));
+        deployment.loupe = IDiamondLoupe(address(deployment.diamond));
     }
 
     function _facetCut(address facet, bytes4[] memory selectors) internal pure returns (IDiamondCut.FacetCut memory) {

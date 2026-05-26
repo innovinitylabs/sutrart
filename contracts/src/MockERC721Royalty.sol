@@ -44,12 +44,7 @@ contract MockERC721Royalty is ERC721, ERC2981 {
         return super.royaltyInfo(tokenId, salePrice);
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721, ERC2981)
-        returns (bool)
-    {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC2981) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }

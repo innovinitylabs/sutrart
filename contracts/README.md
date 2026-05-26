@@ -27,17 +27,19 @@ forge build
 forge test
 forge fmt
 anvil
-forge script script/DeployLocal.s.sol:DeployLocal --rpc-url http://127.0.0.1:8545 --broadcast --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae7827d738f0e05
+forge script script/DeployLocal.s.sol:DeployLocal --rpc-url http://127.0.0.1:8545 --broadcast --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 ```
 
 ## Current MVP contracts
 
-`src/SutrartMarket.sol` is the first listing registry primitive:
+`src/diamond/Diamond.sol` is the deployed protocol entrypoint. Listing,
+settlement, configuration, and views are split across focused facets:
 
 - sellers list while keeping NFT custody
 - buyers purchase atomically with ETH + ERC721 transfer
 - listings are invalidated globally after sale/cancel
 - `isListingValid` protects against stale ownership/approval
+- `previewPayouts` exposes canonical protocol, marketplace, royalty, and seller payouts
 
 `src/MockERC721.sol` is a local test NFT with incremental minting.
 

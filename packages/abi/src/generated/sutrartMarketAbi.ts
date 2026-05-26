@@ -1,10 +1,5 @@
 export const sutrartMarketAbi = [
   {
-    "type": "constructor",
-    "inputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
     "type": "function",
     "name": "MAX_MARKETPLACE_FEE_BPS",
     "inputs": [],
@@ -15,7 +10,7 @@ export const sutrartMarketAbi = [
         "internalType": "uint96"
       }
     ],
-    "stateMutability": "view"
+    "stateMutability": "pure"
   },
   {
     "type": "function",
@@ -28,7 +23,7 @@ export const sutrartMarketAbi = [
         "internalType": "uint96"
       }
     ],
-    "stateMutability": "view"
+    "stateMutability": "pure"
   },
   {
     "type": "function",
@@ -126,7 +121,7 @@ export const sutrartMarketAbi = [
     ],
     "outputs": [
       {
-        "name": "listingId",
+        "name": "storedListingId",
         "type": "uint256",
         "internalType": "uint256"
       },
@@ -208,7 +203,7 @@ export const sutrartMarketAbi = [
       {
         "name": "",
         "type": "tuple",
-        "internalType": "struct SutrartMarket.PayoutPreview",
+        "internalType": "struct ISutrartMarket.PayoutPreview",
         "components": [
           {
             "name": "grossPrice",
@@ -442,25 +437,6 @@ export const sutrartMarketAbi = [
   },
   {
     "type": "event",
-    "name": "OwnershipTransferred",
-    "inputs": [
-      {
-        "name": "previousOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "newOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
     "name": "ProtocolFeeUpdated",
     "inputs": [
       {
@@ -484,32 +460,5 @@ export const sutrartMarketAbi = [
       }
     ],
     "anonymous": false
-  },
-  {
-    "type": "error",
-    "name": "OwnableInvalidOwner",
-    "inputs": [
-      {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "OwnableUnauthorizedAccount",
-    "inputs": [
-      {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "ReentrancyGuardReentrantCall",
-    "inputs": []
   }
 ] as const;

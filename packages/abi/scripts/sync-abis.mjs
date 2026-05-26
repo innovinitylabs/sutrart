@@ -10,7 +10,11 @@ const repoRoot = path.resolve(__dirname, "../../..");
 const outputDir = path.resolve(__dirname, "../src/generated");
 
 const contracts = [
-  { name: "SutrartMarket", exportName: "sutrartMarketAbi" },
+  {
+    sourceFile: "ISutrartMarket.sol",
+    name: "ISutrartMarket",
+    exportName: "sutrartMarketAbi",
+  },
   { name: "MockERC721", exportName: "mockErc721Abi" },
 ];
 
@@ -21,7 +25,7 @@ for (const contract of contracts) {
     repoRoot,
     "contracts",
     "out",
-    `${contract.name}.sol`,
+    contract.sourceFile ?? `${contract.name}.sol`,
     `${contract.name}.json`
   );
 

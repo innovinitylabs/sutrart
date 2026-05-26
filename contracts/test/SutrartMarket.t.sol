@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {Test} from "forge-std/Test.sol";
 import {MockERC721} from "../src/MockERC721.sol";
-import {SutrartMarket} from "../src/SutrartMarket.sol";
+import {ISutrartMarket} from "../src/interfaces/ISutrartMarket.sol";
+import {DiamondTestHelper} from "./helpers/DiamondTestHelper.sol";
 
-contract SutrartMarketTest is Test {
-    SutrartMarket public market;
+contract SutrartMarketTest is DiamondTestHelper {
+    ISutrartMarket public market;
     MockERC721 public nft;
 
     address public seller = makeAddr("seller");
@@ -18,7 +18,7 @@ contract SutrartMarketTest is Test {
     uint256 internal constant PRICE = 1 ether;
 
     function setUp() public {
-        market = new SutrartMarket();
+        market = _deploySutrartDiamond(address(this)).market;
         nft = new MockERC721();
 
         vm.prank(seller);
@@ -72,7 +72,7 @@ contract SutrartMarketTest is Test {
         vm.prank(seller);
         market.cancelListing(listingId);
 
-        (, , , , , bool active, ) = market.listings(listingId);
+        (,,,,, bool active,) = market.listings(listingId);
         assertFalse(active);
         assertFalse(market.isListingValid(listingId));
     }
@@ -94,7 +94,7 @@ contract SutrartMarketTest is Test {
         vm.prank(buyer);
         market.buyListing{value: PRICE}(listingId, address(0), 0);
 
-        (, , , , , bool active, ) = market.listings(listingId);
+        (,,,,, bool active,) = market.listings(listingId);
         assertFalse(active);
         assertEq(nft.ownerOf(TOKEN_ID), buyer);
         assertEq(seller.balance, sellerBalanceBefore + PRICE);
@@ -274,7 +274,7 @@ contract SutrartMarketTest is Test {
         market.updateProtocolTreasury(attacker);
 
         uint256 listingId = _createListing();
-        SutrartMarket.PayoutPreview memory preview = market.previewPayouts(listingId, marketplaceBps);
+        ISutrartMarket.PayoutPreview memory preview = market.previewPayouts(listingId, marketplaceBps);
 
         uint256 sellerBalanceBefore = seller.balance;
         uint256 treasuryBalanceBefore = attacker.balance;

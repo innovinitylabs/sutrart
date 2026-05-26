@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {Test} from "forge-std/Test.sol";
 import {MockERC721Royalty} from "../src/MockERC721Royalty.sol";
-import {SutrartMarket} from "../src/SutrartMarket.sol";
+import {ISutrartMarket} from "../src/interfaces/ISutrartMarket.sol";
+import {DiamondTestHelper} from "./helpers/DiamondTestHelper.sol";
 
-contract SutrartMarketRoyaltyTest is Test {
-    SutrartMarket public market;
+contract SutrartMarketRoyaltyTest is DiamondTestHelper {
+    ISutrartMarket public market;
     MockERC721Royalty public nft;
 
     address public seller = makeAddr("seller");
@@ -19,7 +19,7 @@ contract SutrartMarketRoyaltyTest is Test {
     uint256 internal constant PRICE = 1 ether;
 
     function setUp() public {
-        market = new SutrartMarket();
+        market = _deploySutrartDiamond(address(this)).market;
         nft = new MockERC721Royalty();
 
         vm.prank(seller);
@@ -122,8 +122,7 @@ contract SutrartMarketRoyaltyTest is Test {
         uint256 listingId = _createListing();
         uint96 marketplaceBps = 1_000;
 
-        SutrartMarket.PayoutPreview memory preview =
-            market.previewPayouts(listingId, marketplaceBps);
+        ISutrartMarket.PayoutPreview memory preview = market.previewPayouts(listingId, marketplaceBps);
 
         uint256 sellerBalanceBefore = seller.balance;
         uint256 treasuryBalanceBefore = treasury.balance;
@@ -152,7 +151,7 @@ contract SutrartMarketRoyaltyTest is Test {
         market.updateProtocolFee(50);
 
         uint256 listingId = _createListing();
-        SutrartMarket.PayoutPreview memory preview = market.previewPayouts(listingId, 0);
+        ISutrartMarket.PayoutPreview memory preview = market.previewPayouts(listingId, 0);
 
         assertEq(preview.royaltyAmount, 0);
         assertEq(preview.royaltyRecipient, address(0));
