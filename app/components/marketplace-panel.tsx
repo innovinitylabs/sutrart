@@ -5,14 +5,17 @@ import { formatEther, zeroAddress, type Address } from "viem";
 import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import {
   abis,
+  getMarketInventory,
+  getMarketListingKey,
+  getNormalizedListingFields,
   getProtocolFeeConfig,
-  getValidListings,
-  previewPayouts,
-  type Listing,
+  previewMarketListingPayouts,
+  type MarketListing,
   type PayoutPreview,
 } from "@sutrart/sdk";
 import { Button } from "@/components/ui/button";
 import { useContractAddresses } from "@/lib/contracts";
+import { loadLocalSignedListingFeed } from "@/lib/syndication";
 
 function ListingPayoutBreakdown({
   preview,
@@ -46,13 +49,15 @@ function ListingPayoutBreakdown({
 }
 
 export function MarketplacePanel() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chainId } = useAccount();
   const publicClient = usePublicClient();
   const { marketAddress } = useContractAddresses();
   const { writeContract, data: txHash, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
 
-  const [listings, setListings] = useState<Listing[]>([]);
+  const [listings, setListings] = useState<MarketListing[]>([]);
+  const [signedCount, setSignedCount] = useState(0);
+  const [onchainCount, setOnchainCount] = useState(0);
   const [status, setStatus] = useState<string>("");
   const [protocolFeeBps, setProtocolFeeBps] = useState<bigint>(BigInt(0));
   const [marketplaceFeeBps, setMarketplaceFeeBps] = useState<bigint>(BigInt(0));
@@ -64,12 +69,23 @@ export function MarketplacePanel() {
   const refreshListings = useCallback(async () => {
     if (!publicClient || !marketAddress) {
       setListings([]);
+      setSignedCount(0);
+      setOnchainCount(0);
       return;
     }
 
-    const validListings = await getValidListings(publicClient, marketAddress);
-    setListings(validListings);
-  }, [marketAddress, publicClient]);
+    const localFeed = loadLocalSignedListingFeed();
+    const inventory = await getMarketInventory({
+      publicClient,
+      marketAddress,
+      chainId,
+      signedFeeds: localFeed ? [localFeed] : [],
+    });
+
+    setListings(inventory.listings.filter((listing) => listing.valid));
+    setOnchainCount(inventory.onchain.filter((listing) => listing.valid).length);
+    setSignedCount(inventory.signed.filter((listing) => listing.valid).length);
+  }, [chainId, marketAddress, publicClient]);
 
   const refreshPayoutPreviews = useCallback(async () => {
     if (!publicClient || !marketAddress || listings.length === 0) {
@@ -83,12 +99,12 @@ export function MarketplacePanel() {
 
     await Promise.all(
       listings.map(async (listing) => {
-        const key = listing.listingId.toString();
+        const key = getMarketListingKey(listing);
         try {
-          nextPreviews[key] = await previewPayouts(
+          nextPreviews[key] = await previewMarketListingPayouts(
             publicClient,
             marketAddress,
-            listing.listingId,
+            listing,
             marketplaceFeeBps
           );
         } catch (error) {
@@ -128,7 +144,7 @@ export function MarketplacePanel() {
 
   const isBusy = isPending || isConfirming;
 
-  function buyListing(listing: Listing) {
+  function buyListing(listing: MarketListing) {
     if (!marketAddress) {
       return;
     }
@@ -138,14 +154,28 @@ export function MarketplacePanel() {
       return;
     }
 
+    const normalized = getNormalizedListingFields(listing);
+
+    if (listing.kind === "onchain") {
+      writeContract({
+        address: marketAddress,
+        abi: abis.SutrartMarket,
+        functionName: "buyListing",
+        args: [listing.listingId, marketplaceFeeRecipient, marketplaceFeeBps],
+        value: listing.price,
+      });
+      setStatus(`Buying onchain listing #${listing.listingId.toString()}...`);
+      return;
+    }
+
     writeContract({
       address: marketAddress,
       abi: abis.SutrartMarket,
-      functionName: "buyListing",
-      args: [listing.listingId, marketplaceFeeRecipient, marketplaceFeeBps],
-      value: listing.price,
+      functionName: "buySignedListing",
+      args: [listing.listing, listing.signature, marketplaceFeeRecipient, marketplaceFeeBps],
+      value: normalized.price,
     });
-    setStatus(`Buying listing #${listing.listingId.toString()}...`);
+    setStatus(`Buying signed listing for token #${normalized.tokenId.toString()}...`);
   }
 
   if (!marketAddress) {
@@ -170,6 +200,10 @@ export function MarketplacePanel() {
           Refresh
         </Button>
       </div>
+
+      <p className="text-muted-foreground text-xs">
+        Unified inventory: {onchainCount} onchain, {signedCount} signed (valid only).
+      </p>
 
       {status ? <p className="text-sm">{status}</p> : null}
 
@@ -208,7 +242,7 @@ export function MarketplacePanel() {
           Protocol fee: {protocolFeeBps.toString()} BPS (from contract)
         </p>
         <p className="text-xs text-muted-foreground">
-          Settlement previews are read from onchain `previewPayouts()`.
+          Settlement previews use onchain `previewPayouts()` and `previewSignedPayouts()`.
         </p>
       </section>
 
@@ -217,18 +251,26 @@ export function MarketplacePanel() {
       ) : (
         <div className="space-y-4">
           {listings.map((listing) => {
-            const key = listing.listingId.toString();
+            const key = getMarketListingKey(listing);
+            const normalized = getNormalizedListingFields(listing);
             return (
               <div
                 key={key}
                 className="border-border space-y-3 rounded-lg border p-4"
               >
-                <p className="font-mono text-sm">Listing #{key}</p>
-                <p className="text-muted-foreground text-sm">Seller: {listing.seller}</p>
-                <p className="text-muted-foreground text-sm">
-                  Token #{listing.tokenId.toString()} on {listing.nftContract}
+                <p className="font-mono text-sm">
+                  {listing.kind === "onchain"
+                    ? `Onchain listing #${listing.listingId.toString()}`
+                    : "Signed listing"}
                 </p>
-                <p className="text-sm">Price: {formatEther(listing.price)} ETH</p>
+                <p className="text-muted-foreground text-xs uppercase tracking-wide">
+                  {listing.kind}
+                </p>
+                <p className="text-muted-foreground text-sm">Seller: {normalized.seller}</p>
+                <p className="text-muted-foreground text-sm">
+                  Token #{normalized.tokenId.toString()} on {normalized.nftContract}
+                </p>
+                <p className="text-sm">Price: {formatEther(normalized.price)} ETH</p>
                 <ListingPayoutBreakdown
                   preview={payoutPreviews[key] ?? null}
                   error={payoutErrors[key] ?? null}
@@ -238,7 +280,7 @@ export function MarketplacePanel() {
                   disabled={
                     !isConnected ||
                     isBusy ||
-                    address?.toLowerCase() === listing.seller.toLowerCase() ||
+                    address?.toLowerCase() === normalized.seller.toLowerCase() ||
                     Boolean(payoutErrors[key])
                   }
                   onClick={() => buyListing(listing)}

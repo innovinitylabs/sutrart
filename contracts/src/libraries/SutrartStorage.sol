@@ -19,6 +19,15 @@ library SutrartStorage {
         uint256 createdAt;
     }
 
+    struct SignedListing {
+        address seller;
+        address nftContract;
+        uint256 tokenId;
+        uint256 price;
+        uint256 expiry;
+        uint256 nonce;
+    }
+
     struct Layout {
         mapping(uint256 listingId => Listing) listings;
         uint256 nextListingId;
@@ -28,6 +37,8 @@ library SutrartStorage {
         bool initialized;
         mapping(address creator => address[] collections) creatorCollections;
         mapping(address collection => address creator) collectionCreator;
+        mapping(address seller => uint256 minNonce) signedListingMinNonce;
+        mapping(bytes32 digest => bool filled) filledSignedListings;
     }
 
     function layout() internal pure returns (Layout storage ds) {

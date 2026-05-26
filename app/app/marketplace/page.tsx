@@ -9,7 +9,7 @@ export default function MarketplacePage() {
         <div className="space-y-2">
           <h1 className="text-3xl font-semibold">Marketplace</h1>
           <p className="text-muted-foreground text-sm">
-            Browse active valid listings and buy directly from sellers.
+            Browse unified onchain and signed listings validated against the protocol.
           </p>
         </div>
         <MarketplacePanel />
