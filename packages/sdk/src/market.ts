@@ -79,3 +79,87 @@ export async function getValidListings(
 
   return listings;
 }
+
+export type FeeSplit = {
+  protocolFeePaid: bigint;
+  marketplaceFeePaid: bigint;
+  sellerProceeds: bigint;
+};
+
+export function calculateFeeSplits(
+  grossPrice: bigint,
+  protocolFeeBps: bigint,
+  marketplaceFeeBps: bigint
+): FeeSplit {
+  const protocolFeePaid = (grossPrice * protocolFeeBps) / 10_000n;
+  const marketplaceFeePaid = (grossPrice * marketplaceFeeBps) / 10_000n;
+  const totalFees = protocolFeePaid + marketplaceFeePaid;
+
+  if (totalFees > grossPrice) {
+    throw new Error("Fee split exceeds gross price");
+  }
+
+  return {
+    protocolFeePaid,
+    marketplaceFeePaid,
+    sellerProceeds: grossPrice - totalFees,
+  };
+}
+
+export type ProtocolFeeConfig = {
+  protocolFeeBps: bigint;
+  protocolTreasury: Address;
+  maxProtocolFeeBps: bigint;
+  maxMarketplaceFeeBps: bigint;
+};
+
+export async function getProtocolFeeConfig(
+  publicClient: PublicClient,
+  marketAddress: Address
+): Promise<ProtocolFeeConfig> {
+  const [protocolFeeBps, protocolTreasury, maxProtocolFeeBps, maxMarketplaceFeeBps] =
+    await Promise.all([
+      publicClient.readContract({
+        address: marketAddress,
+        abi: abis.SutrartMarket,
+        functionName: "protocolFeeBps",
+      }),
+      publicClient.readContract({
+        address: marketAddress,
+        abi: abis.SutrartMarket,
+        functionName: "protocolTreasury",
+      }),
+      publicClient.readContract({
+        address: marketAddress,
+        abi: abis.SutrartMarket,
+        functionName: "MAX_PROTOCOL_FEE_BPS",
+      }),
+      publicClient.readContract({
+        address: marketAddress,
+        abi: abis.SutrartMarket,
+        functionName: "MAX_MARKETPLACE_FEE_BPS",
+      }),
+    ]);
+
+  return {
+    protocolFeeBps,
+    protocolTreasury,
+    maxProtocolFeeBps,
+    maxMarketplaceFeeBps,
+  };
+}
+
+export async function estimatePayouts(
+  publicClient: PublicClient,
+  marketAddress: Address,
+  grossPrice: bigint,
+  marketplaceFeeBps: bigint
+): Promise<FeeSplit> {
+  const config = await getProtocolFeeConfig(publicClient, marketAddress);
+  // Contract enforces caps; we replicate the key checks for UI clarity.
+  if (marketplaceFeeBps > config.maxMarketplaceFeeBps) {
+    throw new Error("Marketplace fee too high");
+  }
+
+  return calculateFeeSplits(grossPrice, config.protocolFeeBps, marketplaceFeeBps);
+}

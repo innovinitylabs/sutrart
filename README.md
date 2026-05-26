@@ -50,17 +50,17 @@ Open [http://localhost:3000](http://localhost:3000), connect wallet to Anvil (ch
 
 ## Scripts
 
-| Command                | Description                      |
-| ---------------------- | -------------------------------- |
-| `pnpm dev`             | Start Next.js dev server         |
-| `pnpm build`           | Build workspace packages and app |
-| `pnpm lint`            | Lint all packages                |
-| `pnpm format`          | Format with Prettier             |
-| `pnpm format:check`    | Check formatting                 |
-| `pnpm contracts:build` | `forge build` + ABI sync           |
-| `pnpm contracts:test`  | `forge test`                       |
-| `pnpm contracts:fmt`   | `forge fmt`                        |
-| `pnpm contracts:anvil` | Start local Anvil node             |
+| Command                       | Description                       |
+| ----------------------------- | --------------------------------- |
+| `pnpm dev`                    | Start Next.js dev server          |
+| `pnpm build`                  | Build workspace packages and app  |
+| `pnpm lint`                   | Lint all packages                 |
+| `pnpm format`                 | Format with Prettier              |
+| `pnpm format:check`           | Check formatting                  |
+| `pnpm contracts:build`        | `forge build` + ABI sync          |
+| `pnpm contracts:test`         | `forge test`                      |
+| `pnpm contracts:fmt`          | `forge fmt`                       |
+| `pnpm contracts:anvil`        | Start local Anvil node            |
 | `pnpm contracts:deploy:local` | Deploy to Anvil + write addresses |
 
 ## Environment variables

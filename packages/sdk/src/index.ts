@@ -8,6 +8,11 @@ export {
   getNextListingId,
   getValidListings,
   isListingValid,
+  getProtocolFeeConfig,
+  estimatePayouts,
+  calculateFeeSplits,
   type Listing,
+  type FeeSplit,
+  type ProtocolFeeConfig,
 } from "./market";
 export { getNextTokenId, getOwnedTokenIds, isApprovedForMarket } from "./nft";
