@@ -1,0 +1,27 @@
+{
+  "name": "sutrart",
+  "private": true,
+  "packageManager": "pnpm@10.7.0",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @sutrart/app dev",
+    "build": "pnpm --filter @sutrart/shared --filter @sutrart/abi --filter @sutrart/sdk run build && pnpm --filter @sutrart/app run build",
+    "lint": "pnpm -r lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "contracts:build": "pnpm --filter @sutrart/contracts build",
+    "contracts:test": "pnpm --filter @sutrart/contracts test",
+    "contracts:fmt": "pnpm --filter @sutrart/contracts fmt"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "eslint": "^9.28.0",
+    "eslint-config-prettier": "^10.1.5",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.1"
+  }
+}

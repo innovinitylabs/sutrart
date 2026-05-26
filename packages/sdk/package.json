@@ -1,0 +1,27 @@
+{
+  "name": "@sutrart/sdk",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@sutrart/abi": "workspace:*",
+    "@sutrart/shared": "workspace:*",
+    "viem": "^2.31.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.28.0",
+    "typescript": "^5.8.3"
+  }
+}
