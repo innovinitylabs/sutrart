@@ -16,7 +16,9 @@
     "contracts:test": "pnpm --filter @sutrart/contracts test",
     "contracts:fmt": "pnpm --filter @sutrart/contracts fmt",
     "contracts:anvil": "pnpm --filter @sutrart/contracts anvil",
-    "contracts:deploy:local": "pnpm contracts:build && pnpm --filter @sutrart/contracts deploy:local"
+    "contracts:deploy:local": "pnpm contracts:build && pnpm --filter @sutrart/contracts deploy:local",
+    "contracts:deploy:sepolia": "pnpm contracts:build && pnpm --filter @sutrart/contracts deploy:sepolia",
+    "sdk:test": "pnpm --filter @sutrart/sdk test"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",

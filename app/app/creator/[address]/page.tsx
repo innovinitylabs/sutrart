@@ -1,9 +1,10 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAddress, isAddress } from "viem";
 import { getCreatorStorefront } from "@sutrart/sdk";
+import { defaultChain } from "@sutrart/shared";
 import { Nav } from "@/components/nav";
 import { CollectionGrid } from "@/components/storefront/collection-grid";
+import { CreatorStorefrontSyndication } from "@/components/creator-storefront-syndication";
 import { StorefrontInventorySection } from "@/components/storefront/inventory-section";
 import { getServerMarketAddress, getServerPublicClient } from "@/lib/chain";
 import { loadSyndicatedSignedFeeds } from "@/lib/storefront";
@@ -37,11 +38,15 @@ export default async function CreatorStorefrontPage({ params }: PageProps) {
     );
   }
 
-  const signedFeeds = await loadSyndicatedSignedFeeds();
+  const signedFeeds = await loadSyndicatedSignedFeeds({
+    chainId: defaultChain.id,
+    creator,
+  });
   const storefront = await getCreatorStorefront({
     publicClient,
     marketAddress,
     creator,
+    chainId: defaultChain.id,
     signedFeeds,
   });
 
@@ -81,26 +86,7 @@ export default async function CreatorStorefrontPage({ params }: PageProps) {
           emptyMessage="No unlisted works."
         />
 
-        {storefront.signedListings.length > 0 ? (
-          <section className="space-y-3">
-            <h2 className="text-xl font-semibold">Signed listings</h2>
-            <p className="text-sm text-muted-foreground">
-              Portable offchain orders syndicated into this storefront.
-            </p>
-            <div className="space-y-2">
-              {storefront.signedListings.map((listing) => (
-                <Link
-                  key={listing.structHash}
-                  href={`/listing/signed/${listing.structHash}`}
-                  className="block rounded-lg border border-border p-4 text-sm hover:bg-muted/30"
-                >
-                  Token #{listing.listing.tokenId.toString()} ·{" "}
-                  {listing.source ?? "signed-order"}
-                </Link>
-              ))}
-            </div>
-          </section>
-        ) : null}
+        <CreatorStorefrontSyndication creatorAddress={creator} />
       </main>
     </div>
   );

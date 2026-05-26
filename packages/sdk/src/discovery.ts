@@ -60,7 +60,15 @@ export type MarketListing = OnchainMarketListing | SignedMarketListing;
 export type SignedListingFeed = {
   version: 1;
   chainId: number;
+  chainName?: string;
   market: Address;
+  metadata?: {
+    creator: Address;
+    storefrontUrl?: string;
+    generatedAt: number;
+    chainId: number;
+    protocolVersion: string;
+  };
   orders: SignedListingOrder[];
 };
 
@@ -290,8 +298,50 @@ export function parseSignedListingFeed(input: unknown): SignedListingFeed {
   return {
     version: 1,
     chainId: feed.chainId,
+    chainName: typeof feed.chainName === "string" ? feed.chainName : undefined,
     market: getAddress(feed.market),
+    metadata: parseFeedMetadata(feed.metadata, feed.chainId),
     orders: feed.orders.map(parseSignedListingOrder),
+  };
+}
+
+type FeedMetadataInput = {
+  creator?: unknown;
+  storefrontUrl?: unknown;
+  generatedAt?: unknown;
+  chainId?: unknown;
+  protocolVersion?: unknown;
+};
+
+function parseFeedMetadata(
+  input: unknown,
+  chainId: number
+): SignedListingFeed["metadata"] | undefined {
+  if (!input || typeof input !== "object") {
+    return undefined;
+  }
+
+  const metadata = input as FeedMetadataInput;
+
+  if (!metadata.creator || !isAddress(String(metadata.creator))) {
+    return undefined;
+  }
+
+  if (typeof metadata.generatedAt !== "number") {
+    return undefined;
+  }
+
+  if (typeof metadata.protocolVersion !== "string") {
+    return undefined;
+  }
+
+  return {
+    creator: getAddress(String(metadata.creator)),
+    storefrontUrl:
+      typeof metadata.storefrontUrl === "string" ? metadata.storefrontUrl : undefined,
+    generatedAt: metadata.generatedAt,
+    chainId: typeof metadata.chainId === "number" ? metadata.chainId : chainId,
+    protocolVersion: metadata.protocolVersion,
   };
 }
 

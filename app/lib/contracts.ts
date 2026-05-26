@@ -1,6 +1,6 @@
 "use client";
 
-import { getContractAddress } from "@sutrart/shared";
+import { getContractAddress, isSupportedDeploymentChain } from "@sutrart/shared";
 import { useChainId } from "wagmi";
 
 export function useContractAddresses() {
@@ -8,6 +8,7 @@ export function useContractAddresses() {
 
   return {
     chainId,
+    isSupportedChain: isSupportedDeploymentChain(chainId),
     nftAddress: getContractAddress(chainId, "MockERC721"),
     marketAddress: getContractAddress(chainId, "SutrartMarket"),
   };

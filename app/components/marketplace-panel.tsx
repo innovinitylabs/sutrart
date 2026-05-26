@@ -9,13 +9,17 @@ import {
   getMarketListingKey,
   getNormalizedListingFields,
   getProtocolFeeConfig,
+  mergeSignedFeeds,
   previewMarketListingPayouts,
   type MarketListing,
   type PayoutPreview,
+  type SignedListingFeedV1,
 } from "@sutrart/sdk";
+import { ChainStatus } from "@/components/chain-status";
+import { FeedIngestionPanel } from "@/components/feed-ingestion-panel";
 import { Button } from "@/components/ui/button";
 import { useContractAddresses } from "@/lib/contracts";
-import { loadLocalSignedListingFeed } from "@/lib/syndication";
+import { loadAllLocalFeeds, mergeLocalFeeds } from "@/lib/syndication";
 
 function ListingPayoutBreakdown({
   preview,
@@ -39,9 +43,7 @@ function ListingPayoutBreakdown({
       <p>Royalty: {formatEther(preview.royaltyAmount)} ETH</p>
       <p>
         Royalty recipient:{" "}
-        {preview.royaltyRecipient === zeroAddress
-          ? "None"
-          : preview.royaltyRecipient}
+        {preview.royaltyRecipient === zeroAddress ? "None" : preview.royaltyRecipient}
       </p>
       <p>Seller proceeds: {formatEther(preview.sellerProceeds)} ETH</p>
     </div>
@@ -58,6 +60,8 @@ export function MarketplacePanel() {
   const [listings, setListings] = useState<MarketListing[]>([]);
   const [signedCount, setSignedCount] = useState(0);
   const [onchainCount, setOnchainCount] = useState(0);
+  const [importedFeeds, setImportedFeeds] = useState<SignedListingFeedV1[]>([]);
+  const [remoteFeeds, setRemoteFeeds] = useState<SignedListingFeedV1[]>([]);
   const [status, setStatus] = useState<string>("");
   const [protocolFeeBps, setProtocolFeeBps] = useState<bigint>(BigInt(0));
   const [marketplaceFeeBps, setMarketplaceFeeBps] = useState<bigint>(BigInt(0));
@@ -67,25 +71,29 @@ export function MarketplacePanel() {
   const [payoutErrors, setPayoutErrors] = useState<Record<string, string>>({});
 
   const refreshListings = useCallback(async () => {
-    if (!publicClient || !marketAddress) {
+    if (!publicClient || !marketAddress || !chainId) {
       setListings([]);
       setSignedCount(0);
       setOnchainCount(0);
       return;
     }
 
-    const localFeed = loadLocalSignedListingFeed();
+    const localFeeds = loadAllLocalFeeds(chainId, address);
+    const mergedLocal = mergeLocalFeeds(localFeeds);
+    const signedFeeds = [...(mergedLocal ? [mergedLocal] : []), ...remoteFeeds, ...importedFeeds];
+
     const inventory = await getMarketInventory({
       publicClient,
       marketAddress,
       chainId,
-      signedFeeds: localFeed ? [localFeed] : [],
+      signedFeeds,
+      conflictPolicy: "include-all",
     });
 
     setListings(inventory.listings.filter((listing) => listing.valid));
     setOnchainCount(inventory.onchain.filter((listing) => listing.valid).length);
     setSignedCount(inventory.signed.filter((listing) => listing.valid).length);
-  }, [chainId, marketAddress, publicClient]);
+  }, [address, chainId, importedFeeds, marketAddress, publicClient, remoteFeeds]);
 
   const refreshPayoutPreviews = useCallback(async () => {
     if (!publicClient || !marketAddress || listings.length === 0) {
@@ -180,23 +188,22 @@ export function MarketplacePanel() {
 
   if (!marketAddress) {
     return (
-      <p className="text-muted-foreground text-sm">
-        Local contract addresses are missing. Run `pnpm contracts:anvil` and `pnpm
-        contracts:deploy:local`.
-      </p>
+      <div className="space-y-4">
+        <ChainStatus />
+        <p className="text-muted-foreground text-sm">
+          No deployment manifest found for this chain. Switch to Anvil or deploy to Sepolia.
+        </p>
+      </div>
     );
   }
 
   return (
     <div className="space-y-6">
+      <ChainStatus />
+
       <div className="flex items-center justify-between gap-4">
         <p className="text-muted-foreground text-xs">Market: {marketAddress}</p>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => void refreshListings()}
-          disabled={isBusy}
-        >
+        <Button type="button" variant="outline" onClick={() => void refreshListings()} disabled={isBusy}>
           Refresh
         </Button>
       </div>
@@ -207,7 +214,25 @@ export function MarketplacePanel() {
 
       {status ? <p className="text-sm">{status}</p> : null}
 
-      <section className="space-y-3 rounded-lg border-border border p-4">
+      {chainId ? (
+        <FeedIngestionPanel
+          chainId={chainId}
+          onFeedsChange={(feeds) => {
+            setRemoteFeeds(feeds);
+            if (feeds.length > 1) {
+              try {
+                setImportedFeeds([mergeSignedFeeds(feeds)]);
+              } catch {
+                setImportedFeeds(feeds);
+              }
+            } else {
+              setImportedFeeds(feeds);
+            }
+          }}
+        />
+      ) : null}
+
+      <section className="space-y-3 rounded-lg border border-border p-4">
         <p className="text-sm font-medium">Marketplace fee (execution-time)</p>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-1">
@@ -241,9 +266,6 @@ export function MarketplacePanel() {
         <p className="text-xs text-muted-foreground">
           Protocol fee: {protocolFeeBps.toString()} BPS (from contract)
         </p>
-        <p className="text-xs text-muted-foreground">
-          Settlement previews use onchain `previewPayouts()` and `previewSignedPayouts()`.
-        </p>
       </section>
 
       {listings.length === 0 ? (
@@ -254,20 +276,15 @@ export function MarketplacePanel() {
             const key = getMarketListingKey(listing);
             const normalized = getNormalizedListingFields(listing);
             return (
-              <div
-                key={key}
-                className="border-border space-y-3 rounded-lg border p-4"
-              >
+              <div key={key} className="space-y-3 rounded-lg border border-border p-4">
                 <p className="font-mono text-sm">
                   {listing.kind === "onchain"
                     ? `Onchain listing #${listing.listingId.toString()}`
                     : "Signed listing"}
                 </p>
-                <p className="text-muted-foreground text-xs uppercase tracking-wide">
-                  {listing.kind}
-                </p>
-                <p className="text-muted-foreground text-sm">Seller: {normalized.seller}</p>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">{listing.kind}</p>
+                <p className="text-sm text-muted-foreground">Seller: {normalized.seller}</p>
+                <p className="text-sm text-muted-foreground">
                   Token #{normalized.tokenId.toString()} on {normalized.nftContract}
                 </p>
                 <p className="text-sm">Price: {formatEther(normalized.price)} ETH</p>

@@ -14,6 +14,8 @@ import {
   type CreatorInventory,
   type InventoryToken,
 } from "@sutrart/sdk";
+import { CreatorSignedListingsPanel } from "@/components/creator-signed-listings-panel";
+import { ChainStatus } from "@/components/chain-status";
 import { Button } from "@/components/ui/button";
 import { useContractAddresses } from "@/lib/contracts";
 
@@ -175,14 +177,15 @@ export function CreatorPanel() {
   if (!marketAddress) {
     return (
       <p className="text-muted-foreground text-sm">
-        Local contract addresses are missing. Run `pnpm contracts:anvil` and `pnpm
-        contracts:deploy:local`.
+        No deployment manifest found for this chain. Use Anvil locally or switch to Sepolia after
+        deployment.
       </p>
     );
   }
 
   return (
     <div className="space-y-8">
+      <ChainStatus />
       <section className="grid gap-3 sm:grid-cols-4">
         <InventoryStat label="Collections" value={collectionCount.toString()} />
         <InventoryStat label="Tokens" value={tokenCount.toString()} />
@@ -342,6 +345,8 @@ export function CreatorPanel() {
           </div>
         )}
       </section>
+
+      <CreatorSignedListingsPanel inventory={inventory} onRefresh={refreshInventory} />
     </div>
   );
 }

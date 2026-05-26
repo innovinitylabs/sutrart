@@ -1,64 +1,195 @@
 import {
-  parseSignedListingFeed,
-  serializeSignedListingFeed,
-  type SignedListingFeed,
+  exportSignedListingFeed,
+  importSignedListingFeed,
+  mergeSignedFeeds,
+  getCreatorFeedStorageKey,
+  getMarketplaceFeedUrlsStorageKey,
+  type SignedListingFeedV1,
   type SignedListingOrder,
 } from "@sutrart/sdk";
+import type { Address } from "viem";
 
-const LOCAL_SIGNED_LISTING_FEED_KEY = "sutrart:signed-listing-feed";
+const LEGACY_LOCAL_SIGNED_LISTING_FEED_KEY = "sutrart:signed-listing-feed";
 
-export function loadLocalSignedListingFeed(): SignedListingFeed | null {
+export function loadCreatorFeed(chainId: number, creator: Address): SignedListingFeedV1 | null {
   if (typeof window === "undefined") {
     return null;
   }
 
-  const raw = window.localStorage.getItem(LOCAL_SIGNED_LISTING_FEED_KEY);
+  migrateLegacyFeed(chainId);
+
+  const raw = window.localStorage.getItem(getCreatorFeedStorageKey(chainId, creator));
   if (!raw) {
     return null;
   }
 
   try {
-    return parseSignedListingFeed(JSON.parse(raw));
+    return importSignedListingFeed(JSON.parse(raw));
   } catch {
     return null;
   }
 }
 
-export function saveLocalSignedListingOrder(
-  chainId: number,
-  market: `0x${string}`,
-  order: SignedListingOrder
-): SignedListingFeed {
-  const existing = loadLocalSignedListingFeed();
-  const feed: SignedListingFeed =
-    existing &&
-    existing.chainId === chainId &&
-    existing.market.toLowerCase() === market.toLowerCase()
-      ? existing
-      : {
-          version: 1,
-          chainId,
-          market,
-          orders: [],
-        };
+export function saveCreatorFeed(feed: SignedListingFeedV1): SignedListingFeedV1 {
+  if (typeof window === "undefined") {
+    throw new Error("Creator feeds can only be saved in the browser");
+  }
 
-  const nextOrders = feed.orders.filter((entry) => {
+  const creator = feed.metadata?.creator ?? feed.orders[0]?.listing.seller;
+  if (!creator) {
+    throw new Error("Creator feed requires metadata.creator or at least one order");
+  }
+
+  const serialized = exportSignedListingFeed(feed);
+  window.localStorage.setItem(
+    getCreatorFeedStorageKey(feed.chainId, creator),
+    serialized
+  );
+
+  return feed;
+}
+
+export function loadMarketplaceFeedUrls(chainId: number): string[] {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  const raw = window.localStorage.getItem(getMarketplaceFeedUrlsStorageKey(chainId));
+  if (!raw) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed) ? parsed.filter((entry) => typeof entry === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveMarketplaceFeedUrls(chainId: number, urls: string[]): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(getMarketplaceFeedUrlsStorageKey(chainId), JSON.stringify(urls));
+}
+
+export function loadAllLocalFeeds(chainId: number, creator?: Address): SignedListingFeedV1[] {
+  const feeds: SignedListingFeedV1[] = [];
+
+  if (creator) {
+    const creatorFeed = loadCreatorFeed(chainId, creator);
+    if (creatorFeed) {
+      feeds.push(creatorFeed);
+    }
+  }
+
+  const legacy = loadLegacyFeed();
+  if (legacy && legacy.chainId === chainId) {
+    feeds.push(legacy);
+  }
+
+  return feeds;
+}
+
+export function mergeLocalFeeds(feeds: SignedListingFeedV1[]): SignedListingFeedV1 | null {
+  if (feeds.length === 0) {
+    return null;
+  }
+
+  if (feeds.length === 1) {
+    return feeds[0];
+  }
+
+  return mergeSignedFeeds(feeds);
+}
+
+export function exportCreatorFeed(feed: SignedListingFeedV1): string {
+  return exportSignedListingFeed(feed);
+}
+
+export function importCreatorFeed(json: string): SignedListingFeedV1 {
+  return importSignedListingFeed(JSON.parse(json));
+}
+
+export function appendOrderToCreatorFeed(
+  chainId: number,
+  creator: Address,
+  market: Address,
+  order: SignedListingOrder,
+  chainName: string,
+  storefrontUrl?: string
+): SignedListingFeedV1 {
+  const existing =
+    loadCreatorFeed(chainId, creator) ??
+    ({
+      version: 1,
+      chainId,
+      chainName,
+      market,
+      metadata: {
+        creator,
+        storefrontUrl,
+        generatedAt: Date.now(),
+        chainId,
+        protocolVersion: "1",
+      },
+      orders: [],
+    } satisfies SignedListingFeedV1);
+
+  const nextOrders = existing.orders.filter((entry) => {
     return !(
       entry.listing.nftContract.toLowerCase() === order.listing.nftContract.toLowerCase() &&
-      entry.listing.tokenId === order.listing.tokenId &&
-      entry.listing.seller.toLowerCase() === order.listing.seller.toLowerCase()
+      entry.listing.tokenId === order.listing.tokenId
     );
   });
-
   nextOrders.push(order);
 
-  const nextFeed: SignedListingFeed = {
-    ...feed,
+  const nextFeed: SignedListingFeedV1 = {
+    ...existing,
+    metadata: {
+      creator,
+      storefrontUrl: existing.metadata?.storefrontUrl ?? storefrontUrl,
+      generatedAt: Date.now(),
+      chainId,
+      protocolVersion: "1",
+    },
     orders: nextOrders,
   };
 
-  window.localStorage.setItem(LOCAL_SIGNED_LISTING_FEED_KEY, serializeSignedListingFeed(nextFeed));
-  return nextFeed;
+  return saveCreatorFeed(nextFeed);
 }
 
-export { LOCAL_SIGNED_LISTING_FEED_KEY };
+function loadLegacyFeed(): SignedListingFeedV1 | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const raw = window.localStorage.getItem(LEGACY_LOCAL_SIGNED_LISTING_FEED_KEY);
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    return importSignedListingFeed(JSON.parse(raw));
+  } catch {
+    return null;
+  }
+}
+
+function migrateLegacyFeed(chainId: number): void {
+  const legacy = loadLegacyFeed();
+  if (!legacy || legacy.chainId !== chainId) {
+    return;
+  }
+
+  const creator = legacy.metadata?.creator ?? legacy.orders[0]?.listing.seller;
+  if (!creator || loadCreatorFeed(chainId, creator)) {
+    return;
+  }
+
+  saveCreatorFeed(legacy);
+}
+
+export { LEGACY_LOCAL_SIGNED_LISTING_FEED_KEY };

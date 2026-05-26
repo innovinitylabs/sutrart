@@ -1,0 +1,9 @@
+{
+  "chainId": 11155111,
+  "chainName": "sepolia",
+  "protocolVersion": "1",
+  "gitCommit": "undeployed",
+  "deployedAt": 0,
+  "SutrartMarket": "0x0000000000000000000000000000000000000000",
+  "facets": {}
+}
