@@ -5,13 +5,45 @@ import { formatEther, zeroAddress, type Address } from "viem";
 import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import {
   abis,
-  calculateFeeSplits,
   getProtocolFeeConfig,
   getValidListings,
+  previewPayouts,
   type Listing,
+  type PayoutPreview,
 } from "@sutrart/sdk";
 import { Button } from "@/components/ui/button";
 import { useContractAddresses } from "@/lib/contracts";
+
+function ListingPayoutBreakdown({
+  preview,
+  error,
+}: {
+  preview: PayoutPreview | null;
+  error: string | null;
+}) {
+  if (error) {
+    return <p className="text-xs text-muted-foreground">{error}</p>;
+  }
+
+  if (!preview) {
+    return <p className="text-xs text-muted-foreground">Loading payout preview...</p>;
+  }
+
+  return (
+    <div className="space-y-1 text-xs text-muted-foreground">
+      <p>Protocol fee: {formatEther(preview.protocolFee)} ETH</p>
+      <p>Marketplace fee: {formatEther(preview.marketplaceFee)} ETH</p>
+      <p>Royalty: {formatEther(preview.royaltyAmount)} ETH</p>
+      <p>
+        Royalty recipient:{" "}
+        {preview.royaltyRecipient === zeroAddress
+          ? "None"
+          : preview.royaltyRecipient}
+      </p>
+      <p>Seller proceeds: {formatEther(preview.sellerProceeds)} ETH</p>
+    </div>
+  );
+}
 
 export function MarketplacePanel() {
   const { address, isConnected } = useAccount();
@@ -26,6 +58,8 @@ export function MarketplacePanel() {
   const [marketplaceFeeBps, setMarketplaceFeeBps] = useState<bigint>(BigInt(0));
   const [maxMarketplaceFeeBps, setMaxMarketplaceFeeBps] = useState<bigint>(BigInt(0));
   const [marketplaceFeeRecipient, setMarketplaceFeeRecipient] = useState<Address>(zeroAddress);
+  const [payoutPreviews, setPayoutPreviews] = useState<Record<string, PayoutPreview>>({});
+  const [payoutErrors, setPayoutErrors] = useState<Record<string, string>>({});
 
   const refreshListings = useCallback(async () => {
     if (!publicClient || !marketAddress) {
@@ -37,9 +71,44 @@ export function MarketplacePanel() {
     setListings(validListings);
   }, [marketAddress, publicClient]);
 
+  const refreshPayoutPreviews = useCallback(async () => {
+    if (!publicClient || !marketAddress || listings.length === 0) {
+      setPayoutPreviews({});
+      setPayoutErrors({});
+      return;
+    }
+
+    const nextPreviews: Record<string, PayoutPreview> = {};
+    const nextErrors: Record<string, string> = {};
+
+    await Promise.all(
+      listings.map(async (listing) => {
+        const key = listing.listingId.toString();
+        try {
+          nextPreviews[key] = await previewPayouts(
+            publicClient,
+            marketAddress,
+            listing.listingId,
+            marketplaceFeeBps
+          );
+        } catch (error) {
+          nextErrors[key] =
+            error instanceof Error ? error.message : "Unable to preview payouts";
+        }
+      })
+    );
+
+    setPayoutPreviews(nextPreviews);
+    setPayoutErrors(nextErrors);
+  }, [listings, marketAddress, marketplaceFeeBps, publicClient]);
+
   useEffect(() => {
     void refreshListings();
   }, [refreshListings, isSuccess]);
+
+  useEffect(() => {
+    void refreshPayoutPreviews();
+  }, [refreshPayoutPreviews]);
 
   useEffect(() => {
     if (!publicClient || !marketAddress) return;
@@ -136,7 +205,10 @@ export function MarketplacePanel() {
           </div>
         </div>
         <p className="text-xs text-muted-foreground">
-          Protocol fee: {protocolFeeBps.toString()} BPS
+          Protocol fee: {protocolFeeBps.toString()} BPS (from contract)
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Settlement previews are read from onchain `previewPayouts()`.
         </p>
       </section>
 
@@ -144,48 +216,38 @@ export function MarketplacePanel() {
         <p className="text-muted-foreground text-sm">No active valid listings.</p>
       ) : (
         <div className="space-y-4">
-          {listings.map((listing) => (
-            <div
-              key={listing.listingId.toString()}
-              className="border-border space-y-3 rounded-lg border p-4"
-            >
-              <p className="font-mono text-sm">Listing #{listing.listingId.toString()}</p>
-              <p className="text-muted-foreground text-sm">Seller: {listing.seller}</p>
-              <p className="text-muted-foreground text-sm">
-                Token #{listing.tokenId.toString()} on {listing.nftContract}
-              </p>
-              <p className="text-sm">Price: {formatEther(listing.price)} ETH</p>
-              {(() => {
-                try {
-                  const { protocolFeePaid, marketplaceFeePaid, sellerProceeds } =
-                    calculateFeeSplits(listing.price, protocolFeeBps, marketplaceFeeBps);
-
-                  return (
-                    <div className="space-y-1 text-xs text-muted-foreground">
-                      <p>Protocol fee: {formatEther(protocolFeePaid)} ETH</p>
-                      <p>Marketplace fee: {formatEther(marketplaceFeePaid)} ETH</p>
-                      <p>Seller proceeds: {formatEther(sellerProceeds)} ETH</p>
-                    </div>
-                  );
-                } catch {
-                  return (
-                    <p className="text-xs text-muted-foreground">
-                      Invalid fee split for current inputs.
-                    </p>
-                  );
-                }
-              })()}
-              <Button
-                type="button"
-                disabled={
-                  !isConnected || isBusy || address?.toLowerCase() === listing.seller.toLowerCase()
-                }
-                onClick={() => buyListing(listing)}
+          {listings.map((listing) => {
+            const key = listing.listingId.toString();
+            return (
+              <div
+                key={key}
+                className="border-border space-y-3 rounded-lg border p-4"
               >
-                Buy listing
-              </Button>
-            </div>
-          ))}
+                <p className="font-mono text-sm">Listing #{key}</p>
+                <p className="text-muted-foreground text-sm">Seller: {listing.seller}</p>
+                <p className="text-muted-foreground text-sm">
+                  Token #{listing.tokenId.toString()} on {listing.nftContract}
+                </p>
+                <p className="text-sm">Price: {formatEther(listing.price)} ETH</p>
+                <ListingPayoutBreakdown
+                  preview={payoutPreviews[key] ?? null}
+                  error={payoutErrors[key] ?? null}
+                />
+                <Button
+                  type="button"
+                  disabled={
+                    !isConnected ||
+                    isBusy ||
+                    address?.toLowerCase() === listing.seller.toLowerCase() ||
+                    Boolean(payoutErrors[key])
+                  }
+                  onClick={() => buyListing(listing)}
+                >
+                  Buy listing
+                </Button>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

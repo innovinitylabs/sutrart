@@ -2,6 +2,8 @@
 pragma solidity ^0.8.28;
 
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
+import {IERC2981} from "openzeppelin-contracts/contracts/interfaces/IERC2981.sol";
+import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {ReentrancyGuard} from "openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 
@@ -18,6 +20,15 @@ contract SutrartMarket is ReentrancyGuard, Ownable {
         uint256 price;
         bool active;
         uint256 createdAt;
+    }
+
+    struct PayoutPreview {
+        uint256 grossPrice;
+        uint256 protocolFee;
+        uint256 marketplaceFee;
+        uint256 royaltyAmount;
+        address royaltyRecipient;
+        uint256 sellerProceeds;
     }
 
     uint256 public nextListingId = 1;
@@ -65,6 +76,19 @@ contract SutrartMarket is ReentrancyGuard, Ownable {
         require(treasury != address(0), "Protocol treasury is zero");
         protocolTreasury = treasury;
         emit ProtocolTreasuryUpdated(treasury);
+    }
+
+    function previewPayouts(uint256 listingId, uint96 marketplaceFeeBps)
+        public
+        view
+        returns (PayoutPreview memory)
+    {
+        Listing storage listing = listings[listingId];
+        require(listing.seller != address(0), "Listing does not exist");
+
+        return _computePayoutPreview(
+            listing.nftContract, listing.tokenId, listing.price, marketplaceFeeBps
+        );
     }
 
     function isListingValid(uint256 listingId) public view returns (bool) {
@@ -134,33 +158,36 @@ contract SutrartMarket is ReentrancyGuard, Ownable {
         require(msg.sender != listing.seller, "Seller cannot buy own listing");
         require(msg.value == listing.price, "Incorrect ETH amount");
 
-        uint256 grossPrice = listing.price;
-        uint256 protocolFee = (grossPrice * uint256(protocolFeeBps)) / 10_000;
-        require(marketplaceFeeBps <= MAX_MARKETPLACE_FEE_BPS, "Marketplace fee too high");
+        PayoutPreview memory payout = _computePayoutPreview(
+            listing.nftContract, listing.tokenId, listing.price, marketplaceFeeBps
+        );
 
-        uint256 marketplaceFee = (grossPrice * uint256(marketplaceFeeBps)) / 10_000;
-        if (marketplaceFee > 0) {
+        if (payout.marketplaceFee > 0) {
             require(marketplaceFeeRecipient != address(0), "Marketplace fee recipient is zero");
         }
-
-        uint256 sellerProceeds = grossPrice - protocolFee - marketplaceFee;
 
         listing.active = false;
 
         IERC721(listing.nftContract).safeTransferFrom(listing.seller, msg.sender, listing.tokenId);
 
-        if (protocolFee > 0) {
+        if (payout.protocolFee > 0) {
             require(protocolTreasury != address(0), "Protocol treasury not set");
-            (bool sentProtocolFee, ) = payable(protocolTreasury).call{value: protocolFee}("");
+            (bool sentProtocolFee,) = payable(protocolTreasury).call{value: payout.protocolFee}("");
             require(sentProtocolFee, "Protocol fee transfer failed");
         }
 
-        if (marketplaceFee > 0) {
-            (bool sentMarketplaceFee, ) = payable(marketplaceFeeRecipient).call{value: marketplaceFee}("");
+        if (payout.marketplaceFee > 0) {
+            (bool sentMarketplaceFee,) = payable(marketplaceFeeRecipient).call{value: payout.marketplaceFee}("");
             require(sentMarketplaceFee, "Marketplace fee transfer failed");
         }
 
-        (bool sentSeller, ) = payable(listing.seller).call{value: sellerProceeds}("");
+        uint256 royaltyPaid = _royaltyPayoutAmount(payout.royaltyAmount, payout.royaltyRecipient);
+        if (royaltyPaid > 0) {
+            (bool sentRoyalty,) = payable(payout.royaltyRecipient).call{value: royaltyPaid}("");
+            require(sentRoyalty, "Royalty transfer failed");
+        }
+
+        (bool sentSeller,) = payable(listing.seller).call{value: payout.sellerProceeds}("");
         require(sentSeller, "ETH transfer failed");
 
         emit ListingSold(
@@ -170,9 +197,65 @@ contract SutrartMarket is ReentrancyGuard, Ownable {
             listing.nftContract,
             listing.tokenId,
             listing.price,
-            protocolFee,
-            marketplaceFee,
-            sellerProceeds
+            payout.protocolFee,
+            payout.marketplaceFee,
+            payout.sellerProceeds
         );
+    }
+
+    function _computePayoutPreview(
+        address nftContract,
+        uint256 tokenId,
+        uint256 grossPrice,
+        uint96 marketplaceFeeBps
+    ) internal view returns (PayoutPreview memory preview) {
+        preview.grossPrice = grossPrice;
+        preview.protocolFee = (grossPrice * uint256(protocolFeeBps)) / 10_000;
+        require(marketplaceFeeBps <= MAX_MARKETPLACE_FEE_BPS, "Marketplace fee too high");
+        preview.marketplaceFee = (grossPrice * uint256(marketplaceFeeBps)) / 10_000;
+
+        uint256 remainingAfterFees = grossPrice - preview.protocolFee - preview.marketplaceFee;
+
+        (preview.royaltyRecipient, preview.royaltyAmount) = _lookupRoyalty(nftContract, tokenId, grossPrice);
+        require(preview.royaltyAmount <= remainingAfterFees, "Royalty exceeds seller proceeds");
+
+        uint256 royaltyPaid = _royaltyPayoutAmount(preview.royaltyAmount, preview.royaltyRecipient);
+        preview.sellerProceeds = remainingAfterFees - royaltyPaid;
+    }
+
+    function _lookupRoyalty(address nftContract, uint256 tokenId, uint256 salePrice)
+        internal
+        view
+        returns (address royaltyRecipient, uint256 royaltyAmount)
+    {
+        if (!_supportsERC2981(nftContract)) {
+            return (address(0), 0);
+        }
+
+        (royaltyRecipient, royaltyAmount) = IERC2981(nftContract).royaltyInfo(tokenId, salePrice);
+    }
+
+    function _royaltyPayoutAmount(uint256 royaltyAmount, address royaltyRecipient)
+        internal
+        pure
+        returns (uint256)
+    {
+        if (royaltyAmount == 0 || royaltyRecipient == address(0)) {
+            return 0;
+        }
+
+        return royaltyAmount;
+    }
+
+    function _supportsERC2981(address nftContract) internal view returns (bool) {
+        if (nftContract.code.length == 0) {
+            return false;
+        }
+
+        try IERC165(nftContract).supportsInterface(type(IERC2981).interfaceId) returns (bool supported) {
+            return supported;
+        } catch {
+            return false;
+        }
     }
 }

@@ -11,6 +11,15 @@ export type Listing = {
   createdAt: bigint;
 };
 
+export type PayoutPreview = {
+  grossPrice: bigint;
+  protocolFee: bigint;
+  marketplaceFee: bigint;
+  royaltyAmount: bigint;
+  royaltyRecipient: Address;
+  sellerProceeds: bigint;
+};
+
 export async function getListing(
   publicClient: PublicClient,
   marketAddress: Address,
@@ -80,32 +89,6 @@ export async function getValidListings(
   return listings;
 }
 
-export type FeeSplit = {
-  protocolFeePaid: bigint;
-  marketplaceFeePaid: bigint;
-  sellerProceeds: bigint;
-};
-
-export function calculateFeeSplits(
-  grossPrice: bigint,
-  protocolFeeBps: bigint,
-  marketplaceFeeBps: bigint
-): FeeSplit {
-  const protocolFeePaid = (grossPrice * protocolFeeBps) / 10_000n;
-  const marketplaceFeePaid = (grossPrice * marketplaceFeeBps) / 10_000n;
-  const totalFees = protocolFeePaid + marketplaceFeePaid;
-
-  if (totalFees > grossPrice) {
-    throw new Error("Fee split exceeds gross price");
-  }
-
-  return {
-    protocolFeePaid,
-    marketplaceFeePaid,
-    sellerProceeds: grossPrice - totalFees,
-  };
-}
-
 export type ProtocolFeeConfig = {
   protocolFeeBps: bigint;
   protocolTreasury: Address;
@@ -149,17 +132,25 @@ export async function getProtocolFeeConfig(
   };
 }
 
-export async function estimatePayouts(
+export async function previewPayouts(
   publicClient: PublicClient,
   marketAddress: Address,
-  grossPrice: bigint,
+  listingId: bigint,
   marketplaceFeeBps: bigint
-): Promise<FeeSplit> {
-  const config = await getProtocolFeeConfig(publicClient, marketAddress);
-  // Contract enforces caps; we replicate the key checks for UI clarity.
-  if (marketplaceFeeBps > config.maxMarketplaceFeeBps) {
-    throw new Error("Marketplace fee too high");
-  }
+): Promise<PayoutPreview> {
+  const result = await publicClient.readContract({
+    address: marketAddress,
+    abi: abis.SutrartMarket,
+    functionName: "previewPayouts",
+    args: [listingId, marketplaceFeeBps],
+  });
 
-  return calculateFeeSplits(grossPrice, config.protocolFeeBps, marketplaceFeeBps);
+  return {
+    grossPrice: result.grossPrice,
+    protocolFee: result.protocolFee,
+    marketplaceFee: result.marketplaceFee,
+    royaltyAmount: result.royaltyAmount,
+    royaltyRecipient: result.royaltyRecipient,
+    sellerProceeds: result.sellerProceeds,
+  };
 }

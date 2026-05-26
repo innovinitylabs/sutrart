@@ -266,6 +266,35 @@ contract SutrartMarketTest is Test {
         market.updateProtocolTreasury(attacker);
     }
 
+    function test_previewPayouts_matchesSettlementWithoutRoyalty() public {
+        uint96 protocolBps = 500;
+        uint96 marketplaceBps = 1_000;
+
+        market.updateProtocolFee(protocolBps);
+        market.updateProtocolTreasury(attacker);
+
+        uint256 listingId = _createListing();
+        SutrartMarket.PayoutPreview memory preview = market.previewPayouts(listingId, marketplaceBps);
+
+        uint256 sellerBalanceBefore = seller.balance;
+        uint256 treasuryBalanceBefore = attacker.balance;
+        uint256 marketplaceBalanceBefore = marketplace.balance;
+
+        vm.prank(buyer);
+        market.buyListing{value: PRICE}(listingId, marketplace, marketplaceBps);
+
+        assertEq(attacker.balance, treasuryBalanceBefore + preview.protocolFee);
+        assertEq(marketplace.balance, marketplaceBalanceBefore + preview.marketplaceFee);
+        assertEq(seller.balance, sellerBalanceBefore + preview.sellerProceeds);
+        assertEq(preview.grossPrice, PRICE);
+        assertEq(preview.royaltyAmount, 0);
+    }
+
+    function test_previewPayouts_revertsWhenListingDoesNotExist() public {
+        vm.expectRevert("Listing does not exist");
+        market.previewPayouts(999, 0);
+    }
+
     function _createListing() internal returns (uint256 listingId) {
         vm.prank(seller);
         nft.approve(address(market), TOKEN_ID);
