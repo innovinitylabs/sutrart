@@ -14,7 +14,9 @@
     "format:check": "prettier --check .",
     "contracts:build": "pnpm --filter @sutrart/contracts build && pnpm --filter @sutrart/abi abi:sync",
     "contracts:test": "pnpm --filter @sutrart/contracts test",
-    "contracts:fmt": "pnpm --filter @sutrart/contracts fmt"
+    "contracts:fmt": "pnpm --filter @sutrart/contracts fmt",
+    "contracts:anvil": "pnpm --filter @sutrart/contracts anvil",
+    "contracts:deploy:local": "pnpm contracts:build && pnpm --filter @sutrart/contracts deploy:local"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",

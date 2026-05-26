@@ -38,6 +38,25 @@ contract SutrartMarket is ReentrancyGuard {
         uint256 price
     );
 
+    function isListingValid(uint256 listingId) public view returns (bool) {
+        Listing storage listing = listings[listingId];
+
+        if (!listing.active || listing.seller == address(0)) {
+            return false;
+        }
+
+        IERC721 nft = IERC721(listing.nftContract);
+
+        if (nft.ownerOf(listing.tokenId) != listing.seller) {
+            return false;
+        }
+
+        bool isApproved = nft.getApproved(listing.tokenId) == address(this)
+            || nft.isApprovedForAll(listing.seller, address(this));
+
+        return isApproved;
+    }
+
     function listNFT(address nftContract, uint256 tokenId, uint256 price) external returns (uint256 listingId) {
         require(nftContract != address(0), "NFT contract cannot be zero");
         require(price > 0, "Price must be greater than zero");
@@ -78,7 +97,7 @@ contract SutrartMarket is ReentrancyGuard {
     function buyListing(uint256 listingId) external payable nonReentrant {
         Listing storage listing = listings[listingId];
 
-        require(listing.active, "Listing is not active");
+        require(isListingValid(listingId), "Listing is not valid");
         require(msg.sender != listing.seller, "Seller cannot buy own listing");
         require(msg.value == listing.price, "Incorrect ETH amount");
 

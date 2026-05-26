@@ -2,16 +2,8 @@
 pragma solidity ^0.8.28;
 
 import {Test} from "forge-std/Test.sol";
-import {ERC721} from "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
+import {MockERC721} from "../src/MockERC721.sol";
 import {SutrartMarket} from "../src/SutrartMarket.sol";
-
-contract MockERC721 is ERC721 {
-    constructor() ERC721("Sutrart Test NFT", "STN") {}
-
-    function mint(address to, uint256 tokenId) external {
-        _mint(to, tokenId);
-    }
-}
 
 contract SutrartMarketTest is Test {
     SutrartMarket public market;
@@ -28,7 +20,9 @@ contract SutrartMarketTest is Test {
         market = new SutrartMarket();
         nft = new MockERC721();
 
-        nft.mint(seller, TOKEN_ID);
+        vm.prank(seller);
+        nft.mint(seller);
+
         vm.deal(seller, 10 ether);
         vm.deal(buyer, 10 ether);
         vm.deal(attacker, 10 ether);
@@ -58,6 +52,7 @@ contract SutrartMarketTest is Test {
         assertEq(storedPrice, PRICE);
         assertTrue(active);
         assertEq(createdAt, block.timestamp);
+        assertTrue(market.isListingValid(listingId));
     }
 
     function test_listNFT_RevertWhenCallerNotOwner() public {
@@ -77,6 +72,7 @@ contract SutrartMarketTest is Test {
 
         (, , , , , bool active, ) = market.listings(listingId);
         assertFalse(active);
+        assertFalse(market.isListingValid(listingId));
     }
 
     function test_cancelListing_RevertWhenNotSeller() public {
@@ -98,6 +94,7 @@ contract SutrartMarketTest is Test {
         assertFalse(active);
         assertEq(nft.ownerOf(TOKEN_ID), buyer);
         assertEq(seller.balance, sellerBalanceBefore + PRICE);
+        assertFalse(market.isListingValid(listingId));
     }
 
     function test_buyListing_RevertOnDoublePurchase() public {
@@ -106,7 +103,7 @@ contract SutrartMarketTest is Test {
         vm.prank(buyer);
         market.buyListing{value: PRICE}(listingId);
 
-        vm.expectRevert("Listing is not active");
+        vm.expectRevert("Listing is not valid");
         vm.prank(attacker);
         market.buyListing{value: PRICE}(listingId);
     }
@@ -124,6 +121,34 @@ contract SutrartMarketTest is Test {
 
         vm.expectRevert("Seller cannot buy own listing");
         vm.prank(seller);
+        market.buyListing{value: PRICE}(listingId);
+    }
+
+    function test_isListingValid_RevertWhenApprovalRevoked() public {
+        uint256 listingId = _createListing();
+        assertTrue(market.isListingValid(listingId));
+
+        vm.prank(seller);
+        nft.approve(address(0), TOKEN_ID);
+
+        assertFalse(market.isListingValid(listingId));
+
+        vm.expectRevert("Listing is not valid");
+        vm.prank(buyer);
+        market.buyListing{value: PRICE}(listingId);
+    }
+
+    function test_isListingValid_RevertWhenOwnershipChanges() public {
+        uint256 listingId = _createListing();
+        assertTrue(market.isListingValid(listingId));
+
+        vm.prank(seller);
+        nft.transferFrom(seller, attacker, TOKEN_ID);
+
+        assertFalse(market.isListingValid(listingId));
+
+        vm.expectRevert("Listing is not valid");
+        vm.prank(buyer);
         market.buyListing{value: PRICE}(listingId);
     }
 

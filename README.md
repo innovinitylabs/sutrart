@@ -27,11 +27,15 @@ pnpm install
 cp .env.example app/.env.local
 # Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID (https://cloud.walletconnect.com/)
 
-pnpm contracts:build
+# Terminal 1
+pnpm contracts:anvil
+
+# Terminal 2
+pnpm contracts:deploy:local
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000), connect wallet to Anvil (chain 31337), then use **My NFTs** and **Marketplace**.
 
 ## Monorepo layout
 
@@ -53,9 +57,11 @@ Open [http://localhost:3000](http://localhost:3000).
 | `pnpm lint`            | Lint all packages                |
 | `pnpm format`          | Format with Prettier             |
 | `pnpm format:check`    | Check formatting                 |
-| `pnpm contracts:build` | `forge build`                    |
-| `pnpm contracts:test`  | `forge test`                     |
-| `pnpm contracts:fmt`   | `forge fmt`                      |
+| `pnpm contracts:build` | `forge build` + ABI sync           |
+| `pnpm contracts:test`  | `forge test`                       |
+| `pnpm contracts:fmt`   | `forge fmt`                        |
+| `pnpm contracts:anvil` | Start local Anvil node             |
+| `pnpm contracts:deploy:local` | Deploy to Anvil + write addresses |
 
 ## Environment variables
 
@@ -71,7 +77,6 @@ Copy `.env.example` to `app/.env.local`:
 - Authentication (SIWE, social login, etc.)
 - Backend API, database, or indexing
 - Marketplace or listing business logic
-- Production deployment configuration
 
 ## Documentation
 
