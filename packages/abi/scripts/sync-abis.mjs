@@ -15,6 +15,12 @@ const contracts = [
     name: "ISutrartMarket",
     exportName: "sutrartMarketAbi",
   },
+  {
+    sourceFile: "IERC721RTFactory.sol",
+    name: "IERC721RTFactory",
+    exportName: "erc721rtFactoryAbi",
+  },
+  { name: "ERC721RT", exportName: "erc721rtAbi" },
   { name: "MockERC721", exportName: "mockErc721Abi" },
 ];
 

@@ -26,6 +26,8 @@ library SutrartStorage {
         address protocolTreasury;
         uint256 reentrancyStatus;
         bool initialized;
+        mapping(address creator => address[] collections) creatorCollections;
+        mapping(address collection => address creator) collectionCreator;
     }
 
     function layout() internal pure returns (Layout storage ds) {

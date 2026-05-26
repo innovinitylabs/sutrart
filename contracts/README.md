@@ -33,13 +33,18 @@ forge script script/DeployLocal.s.sol:DeployLocal --rpc-url http://127.0.0.1:854
 ## Current MVP contracts
 
 `src/diamond/Diamond.sol` is the deployed protocol entrypoint. Listing,
-settlement, configuration, and views are split across focused facets:
+settlement, configuration, views, and ERC721RT collection deployment are split
+across focused facets:
 
 - sellers list while keeping NFT custody
 - buyers purchase atomically with ETH + ERC721 transfer
 - listings are invalidated globally after sale/cancel
 - `isListingValid` protects against stale ownership/approval
 - `previewPayouts` exposes canonical protocol, marketplace, royalty, and seller payouts
+- `createCollection` deploys standalone creator-owned ERC721RT collections
+
+`src/tokens/ERC721RT.sol` is the creator collection standard: ERC721 + ERC2981 with
+owner-controlled minting and metadata configuration.
 
 `src/MockERC721.sol` is a local test NFT with incremental minting.
 

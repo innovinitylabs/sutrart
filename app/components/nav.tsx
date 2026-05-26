@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/", label: "Home" },
+  { href: "/creator", label: "Creator" },
   { href: "/my-nfts", label: "My NFTs" },
   { href: "/marketplace", label: "Marketplace" },
 ];
