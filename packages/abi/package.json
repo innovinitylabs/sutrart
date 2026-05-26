@@ -12,6 +12,7 @@
     }
   },
   "scripts": {
+    "abi:sync": "node scripts/sync-abis.mjs",
     "build": "tsc",
     "lint": "eslint src/"
   },

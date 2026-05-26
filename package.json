@@ -12,7 +12,7 @@
     "lint": "pnpm -r lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "contracts:build": "pnpm --filter @sutrart/contracts build",
+    "contracts:build": "pnpm --filter @sutrart/contracts build && pnpm --filter @sutrart/abi abi:sync",
     "contracts:test": "pnpm --filter @sutrart/contracts test",
     "contracts:fmt": "pnpm --filter @sutrart/contracts fmt"
   },

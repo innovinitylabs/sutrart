@@ -26,6 +26,10 @@ forge test
 forge fmt
 ```
 
-## Smoke test
+## Current MVP contract
 
-`src/Counter.sol` is the default Foundry example. Replace it when adding the first protocol contracts.
+`src/SutrartMarket.sol` is the first listing registry primitive:
+
+- sellers list while keeping NFT custody
+- buyers purchase atomically with ETH + ERC721 transfer
+- listings are invalidated globally after sale/cancel
