@@ -11,6 +11,8 @@ contract DeploySepolia is DeploySutrartBase {
 
         vm.stopBroadcast();
 
+        logDeploymentSummary(deployment);
+
         writeDeploymentManifest(
             "sepolia",
             "../packages/shared/src/deployments/sepolia.json",

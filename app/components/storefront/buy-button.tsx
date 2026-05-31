@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { zeroAddress, type Address } from "viem";
-import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useAccount } from "wagmi";
 import {
   abis,
   getNormalizedListingFields,
   type MarketListing,
 } from "@sutrart/sdk";
 import { Button } from "@/components/ui/button";
+import { StatusMessage } from "@/components/status-message";
+import { useWriteContractFeedback } from "@/lib/use-write-contract-feedback";
 
 export function BuyButton({
   listing,
@@ -24,12 +26,17 @@ export function BuyButton({
   label?: string;
 }) {
   const { address, isConnected } = useAccount();
-  const { writeContract, data: txHash, isPending } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
-  const [status, setStatus] = useState<string>("");
+  const {
+    writeContract,
+    isBusy,
+    isSuccess,
+    status,
+    errorMessage,
+    setPendingStatus,
+  } = useWriteContractFeedback();
+  const [localError, setLocalError] = useState("");
 
   const normalized = getNormalizedListingFields(listing);
-  const isBusy = isPending || isConfirming;
   const disabled =
     !isConnected ||
     isBusy ||
@@ -37,8 +44,10 @@ export function BuyButton({
     address?.toLowerCase() === normalized.seller.toLowerCase();
 
   function buy() {
+    setLocalError("");
+
     if (marketplaceFeeBps > BigInt(0) && marketplaceFeeRecipient === zeroAddress) {
-      setStatus("Marketplace fee recipient is required when feeBps > 0");
+      setLocalError("Marketplace fee recipient is required when feeBps > 0");
       return;
     }
 
@@ -50,7 +59,7 @@ export function BuyButton({
         args: [listing.listingId, marketplaceFeeRecipient, marketplaceFeeBps],
         value: normalized.price,
       });
-      setStatus(`Buying onchain listing #${listing.listingId.toString()}...`);
+      setPendingStatus(`Buying onchain listing #${listing.listingId.toString()}...`);
       return;
     }
 
@@ -61,7 +70,7 @@ export function BuyButton({
       args: [listing.listing, listing.signature, marketplaceFeeRecipient, marketplaceFeeBps],
       value: normalized.price,
     });
-    setStatus(`Buying signed listing...`);
+    setPendingStatus("Buying signed listing...");
   }
 
   return (
@@ -69,7 +78,10 @@ export function BuyButton({
       <Button type="button" disabled={disabled} onClick={buy}>
         {isSuccess ? "Purchased" : isBusy ? "Processing..." : label}
       </Button>
-      {status ? <p className="text-xs text-muted-foreground">{status}</p> : null}
+      <StatusMessage message={status} error={localError || errorMessage || undefined} />
+      {!normalized.valid ? (
+        <p className="text-xs text-amber-700">This listing is not valid for purchase.</p>
+      ) : null}
     </div>
   );
 }

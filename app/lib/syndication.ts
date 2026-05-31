@@ -7,6 +7,7 @@ import {
   type SignedListingFeedV1,
   type SignedListingOrder,
 } from "@sutrart/sdk";
+import { SUTRART_PROTOCOL_VERSION } from "@sutrart/shared";
 import type { Address } from "viem";
 
 const LEGACY_LOCAL_SIGNED_LISTING_FEED_KEY = "sutrart:signed-listing-feed";
@@ -25,7 +26,12 @@ export function loadCreatorFeed(chainId: number, creator: Address): SignedListin
 
   try {
     return importSignedListingFeed(JSON.parse(raw));
-  } catch {
+  } catch (error) {
+    console.warn("[sutrart] Failed to parse creator feed JSON.", {
+      chainId,
+      creator,
+      error: error instanceof Error ? error.message : String(error),
+    });
     return null;
   }
 }
@@ -62,7 +68,11 @@ export function loadMarketplaceFeedUrls(chainId: number): string[] {
   try {
     const parsed = JSON.parse(raw) as unknown;
     return Array.isArray(parsed) ? parsed.filter((entry) => typeof entry === "string") : [];
-  } catch {
+  } catch (error) {
+    console.warn("[sutrart] Failed to parse marketplace feed URL list from localStorage.", {
+      chainId,
+      error: error instanceof Error ? error.message : String(error),
+    });
     return [];
   }
 }
@@ -133,7 +143,7 @@ export function appendOrderToCreatorFeed(
         storefrontUrl,
         generatedAt: Date.now(),
         chainId,
-        protocolVersion: "1",
+        protocolVersion: SUTRART_PROTOCOL_VERSION,
       },
       orders: [],
     } satisfies SignedListingFeedV1);
@@ -153,7 +163,7 @@ export function appendOrderToCreatorFeed(
       storefrontUrl: existing.metadata?.storefrontUrl ?? storefrontUrl,
       generatedAt: Date.now(),
       chainId,
-      protocolVersion: "1",
+      protocolVersion: SUTRART_PROTOCOL_VERSION,
     },
     orders: nextOrders,
   };
@@ -173,7 +183,10 @@ function loadLegacyFeed(): SignedListingFeedV1 | null {
 
   try {
     return importSignedListingFeed(JSON.parse(raw));
-  } catch {
+  } catch (error) {
+    console.warn("[sutrart] Failed to parse legacy signed listing feed JSON.", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return null;
   }
 }

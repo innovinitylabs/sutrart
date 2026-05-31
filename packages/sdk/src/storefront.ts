@@ -180,7 +180,12 @@ export async function getTokenRoyaltyInfo(
       recipient,
       bps: (amount * 10_000n) / referencePrice,
     };
-  } catch {
+  } catch (error) {
+    console.warn("[sutrart] royaltyInfo readContract failed.", {
+      collectionAddress,
+      tokenId: tokenId.toString(),
+      error: error instanceof Error ? error.message : String(error),
+    });
     return { recipient: null, bps: null };
   }
 }

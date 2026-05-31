@@ -11,10 +11,17 @@ if [[ -z "${DEPLOYER_PRIVATE_KEY:-}" ]]; then
   exit 1
 fi
 
-export GIT_COMMIT="${GIT_COMMIT:-$(git -C "$(dirname "$0")/../.." rev-parse HEAD)}"
+ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+CONTRACTS_DIR="$(dirname "$0")/.."
+MANIFEST_PATH="${ROOT_DIR}/packages/shared/src/deployments/sepolia.json"
+
+export GIT_COMMIT="${GIT_COMMIT:-$(git -C "${ROOT_DIR}" rev-parse HEAD)}"
 
 echo "Deploying Sutrart Diamond to Sepolia..."
 echo "Git commit: ${GIT_COMMIT}"
+echo "Protocol version: v0.1-alpha"
+
+cd "${CONTRACTS_DIR}"
 
 forge script script/DeploySepolia.s.sol:DeploySepolia \
   --rpc-url "${SEPOLIA_RPC_URL}" \
@@ -22,4 +29,9 @@ forge script script/DeploySepolia.s.sol:DeploySepolia \
   --private-key "${DEPLOYER_PRIVATE_KEY}" \
   -vvv
 
-echo "Deployment manifest written to packages/shared/src/deployments/sepolia.json"
+echo "Validating deployment manifest..."
+node "${ROOT_DIR}/scripts/validate-deployment-manifest.mjs" "${MANIFEST_PATH}"
+
+echo "Sepolia deployment complete."
+echo "Manifest: ${MANIFEST_PATH}"
+echo "Next: set NEXT_PUBLIC_DEFAULT_CHAIN_ID=11155111 in app/.env.local for alpha testing."

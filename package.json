@@ -18,6 +18,8 @@
     "contracts:anvil": "pnpm --filter @sutrart/contracts anvil",
     "contracts:deploy:local": "pnpm contracts:build && pnpm --filter @sutrart/contracts deploy:local",
     "contracts:deploy:sepolia": "pnpm contracts:build && pnpm --filter @sutrart/contracts deploy:sepolia",
+    "manifest:validate": "node scripts/validate-deployment-manifest.mjs packages/shared/src/deployments/sepolia.json",
+    "manifest:validate:local": "node scripts/validate-deployment-manifest.mjs packages/shared/src/deployments/local.json",
     "sdk:test": "pnpm --filter @sutrart/sdk test"
   },
   "devDependencies": {

@@ -6,9 +6,7 @@ import { formatEther, parseEther } from "viem";
 import {
   useAccount,
   usePublicClient,
-  useWaitForTransactionReceipt,
   useWalletClient,
-  useWriteContract,
 } from "wagmi";
 import {
   abis,
@@ -29,6 +27,9 @@ import {
 } from "@sutrart/sdk";
 import { getChainDisplayName, getAppUrl } from "@sutrart/shared";
 import { Button } from "@/components/ui/button";
+import { SignedListingStateHint } from "@/components/listing-validity-badge";
+import { StatusMessage } from "@/components/status-message";
+import { formatPanelError } from "@/components/status-message";
 import {
   exportCreatorFeed,
   importCreatorFeed,
@@ -36,6 +37,7 @@ import {
   saveCreatorFeed,
 } from "@/lib/syndication";
 import { useContractAddresses } from "@/lib/contracts";
+import { useWriteContractFeedback } from "@/lib/use-write-contract-feedback";
 
 export function CreatorSignedListingsPanel({
   inventory,
@@ -48,8 +50,14 @@ export function CreatorSignedListingsPanel({
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
   const { marketAddress, isSupportedChain } = useContractAddresses();
-  const { writeContract, data: txHash, isPending } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
+  const {
+    writeContract,
+    isBusy,
+    isSuccess,
+    status: txStatus,
+    errorMessage: txError,
+    setPendingStatus,
+  } = useWriteContractFeedback();
 
   const [signedPriceByToken, setSignedPriceByToken] = useState<Record<string, string>>({});
   const [expiryHoursByToken, setExpiryHoursByToken] = useState<Record<string, string>>({});
@@ -57,8 +65,7 @@ export function CreatorSignedListingsPanel({
   const [feed, setFeed] = useState<SignedListingFeedV1 | null>(null);
   const [importJson, setImportJson] = useState("");
   const [status, setStatus] = useState("");
-
-  const isBusy = isPending || isConfirming;
+  const [panelError, setPanelError] = useState("");
 
   const refreshSignedState = useCallback(async () => {
     if (!publicClient || !marketAddress || !address || !chainId) {
@@ -102,50 +109,57 @@ export function CreatorSignedListingsPanel({
       return;
     }
 
-    const key = `${token.collection}-${token.tokenId.toString()}`;
-    const priceInput = signedPriceByToken[key] ?? "0.01";
-    const expiryHours = Number(expiryHoursByToken[key] ?? "24");
-    const nonce = await getSignedListingMinNonce(publicClient, marketAddress, address);
-    const expiry =
-      Number.isFinite(expiryHours) && expiryHours > 0
-        ? BigInt(Math.floor(Date.now() / 1000) + expiryHours * 3600)
-        : BigInt(0);
+    setPanelError("");
 
-    const listing = buildSignedListingDraft({
-      seller: address,
-      nftContract: token.collection,
-      tokenId: token.tokenId,
-      price: parseEther(priceInput),
-      expiry,
-      nonce,
-    });
+    try {
+      const key = `${token.collection}-${token.tokenId.toString()}`;
+      const priceInput = signedPriceByToken[key] ?? "0.01";
+      const expiryHours = Number(expiryHoursByToken[key] ?? "24");
+      const nonce = await getSignedListingMinNonce(publicClient, marketAddress, address);
+      const expiry =
+        Number.isFinite(expiryHours) && expiryHours > 0
+          ? BigInt(Math.floor(Date.now() / 1000) + expiryHours * 3600)
+          : BigInt(0);
 
-    const signature = await signSignedListing(walletClient, marketAddress, listing, chainId);
-
-    const currentFeed =
-      loadCreatorFeed(chainId, address) ??
-      createSignedListingFeed({
-        chainId,
-        chainName: getChainDisplayName(chainId),
-        market: marketAddress,
-        creator: address,
-        storefrontUrl: `${getAppUrl()}${buildCreatorStorefrontPath(address)}`,
+      const listing = buildSignedListingDraft({
+        seller: address,
+        nftContract: token.collection,
+        tokenId: token.tokenId,
+        price: parseEther(priceInput),
+        expiry,
+        nonce,
       });
 
-    const published = publishSignedListing({
-      feed: currentFeed,
-      order: {
-        listing,
-        signature,
-        source: "creator-dashboard",
-        publishedAt: Date.now(),
-      },
-    });
+      setStatus("Confirm the EIP-712 signed listing request in your wallet...");
+      const signature = await signSignedListing(walletClient, marketAddress, listing, chainId);
 
-    saveCreatorFeed(published);
-    setFeed(published);
-    setStatus(`Signed and published token #${token.tokenId.toString()} to local feed.`);
-    await refreshSignedState();
+      const currentFeed =
+        loadCreatorFeed(chainId, address) ??
+        createSignedListingFeed({
+          chainId,
+          chainName: getChainDisplayName(chainId),
+          market: marketAddress,
+          creator: address,
+          storefrontUrl: `${getAppUrl()}${buildCreatorStorefrontPath(address)}`,
+        });
+
+      const published = publishSignedListing({
+        feed: currentFeed,
+        order: {
+          listing,
+          signature,
+          source: "creator-dashboard",
+          publishedAt: Date.now(),
+        },
+      });
+
+      saveCreatorFeed(published);
+      setFeed(published);
+      setStatus(`Signed and published token #${token.tokenId.toString()} to local feed.`);
+      await refreshSignedState();
+    } catch (error) {
+      setPanelError(formatPanelError(error, "Unable to sign and publish listing."));
+    }
   }
 
   async function previewSigned(token: InventoryToken) {
@@ -162,23 +176,27 @@ export function CreatorSignedListingsPanel({
         ? BigInt(Math.floor(Date.now() / 1000) + expiryHours * 3600)
         : BigInt(0);
 
-    const preview = await previewSignedPayouts(
-      publicClient,
-      marketAddress,
-      buildSignedListingDraft({
-        seller: address,
-        nftContract: token.collection,
-        tokenId: token.tokenId,
-        price: parseEther(priceInput),
-        expiry,
-        nonce,
-      }),
-      BigInt(0)
-    );
+    try {
+      const preview = await previewSignedPayouts(
+        publicClient,
+        marketAddress,
+        buildSignedListingDraft({
+          seller: address,
+          nftContract: token.collection,
+          tokenId: token.tokenId,
+          price: parseEther(priceInput),
+          expiry,
+          nonce,
+        }),
+        BigInt(0)
+      );
 
-    setStatus(
-      `Preview for #${token.tokenId.toString()}: seller proceeds ${formatEther(preview.sellerProceeds)} ETH, royalty ${formatEther(preview.royaltyAmount)} ETH.`
-    );
+      setStatus(
+        `Preview for #${token.tokenId.toString()}: seller proceeds ${formatEther(preview.sellerProceeds)} ETH, royalty ${formatEther(preview.royaltyAmount)} ETH.`
+      );
+    } catch (error) {
+      setPanelError(formatPanelError(error, "Unable to preview signed listing payouts."));
+    }
   }
 
   function revokeSignedListings() {
@@ -191,7 +209,7 @@ export function CreatorSignedListingsPanel({
       abi: abis.SutrartMarket,
       functionName: "incrementSignedListingNonce",
     });
-    setStatus("Revoking all signed listings below current nonce...");
+    setPendingStatus("Revoking all signed listings below current nonce...");
   }
 
   function removeFromFeed(entry: CreatorSignedListingEntry) {
@@ -247,13 +265,19 @@ export function CreatorSignedListingsPanel({
       return;
     }
 
-    const imported = importCreatorFeed(importJson);
-    saveCreatorFeed(imported);
-    setFeed(imported);
-    setImportJson("");
-    setStatus("Imported feed JSON.");
-    void refreshSignedState();
+    try {
+      const imported = importCreatorFeed(importJson);
+      saveCreatorFeed(imported);
+      setFeed(imported);
+      setImportJson("");
+      setStatus("Imported feed JSON.");
+      void refreshSignedState();
+    } catch (error) {
+      setPanelError(formatPanelError(error, "Unable to import feed JSON."));
+    }
   }
+
+  const displayStatus = txError || status || txStatus;
 
   const activeEntries = useMemo(() => entries.filter((entry) => entry.valid), [entries]);
   const staleEntries = useMemo(
@@ -271,7 +295,8 @@ export function CreatorSignedListingsPanel({
         <h2 className="text-lg font-medium">Signed listing syndication</h2>
         <p className="text-sm text-muted-foreground">
           Sign portable listings, publish to your creator feed, and syndicate into storefront and
-          marketplace discovery.
+          marketplace discovery. Wallet signing uses EIP-712 typed data tied to the Sutrart market
+          contract on this chain.
         </p>
         {address ? (
           <Link href={buildCreatorStorefrontPath(address)} className="text-sm underline-offset-4 hover:underline">
@@ -280,7 +305,7 @@ export function CreatorSignedListingsPanel({
         ) : null}
       </div>
 
-      {status ? <p className="text-sm">{status}</p> : null}
+      <StatusMessage message={displayStatus} error={panelError || undefined} />
 
       <div className="space-y-3">
         <h3 className="text-base font-medium">Sign unlisted inventory</h3>
@@ -404,6 +429,11 @@ function ListingEntryList({
           <p>Price: {formatEther(entry.order.listing.price)} ETH</p>
           <p>Valid: {entry.valid ? "yes" : "no"}</p>
           <p>Expired: {entry.expired ? "yes" : "no"}</p>
+          <SignedListingStateHint
+            valid={entry.valid}
+            expired={entry.expired}
+            filled={entry.filled}
+          />
           <div className="flex flex-wrap gap-2">
             <Link href={buildSignedListingPath(entry.structHash)} className="underline-offset-4 hover:underline">
               Canonical listing

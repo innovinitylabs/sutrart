@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { formatEther, zeroAddress, type Address } from "viem";
-import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
 import {
   abis,
   getMarketInventory,
@@ -17,8 +17,12 @@ import {
 } from "@sutrart/sdk";
 import { ChainStatus } from "@/components/chain-status";
 import { FeedIngestionPanel } from "@/components/feed-ingestion-panel";
+import { ListingValidityBadge } from "@/components/listing-validity-badge";
+import { StatusMessage } from "@/components/status-message";
+import { formatPanelError } from "@/components/status-message";
 import { Button } from "@/components/ui/button";
 import { useContractAddresses } from "@/lib/contracts";
+import { useWriteContractFeedback } from "@/lib/use-write-contract-feedback";
 import { loadAllLocalFeeds, mergeLocalFeeds } from "@/lib/syndication";
 
 function ListingPayoutBreakdown({
@@ -54,10 +58,17 @@ export function MarketplacePanel() {
   const { address, isConnected, chainId } = useAccount();
   const publicClient = usePublicClient();
   const { marketAddress } = useContractAddresses();
-  const { writeContract, data: txHash, isPending } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
+  const {
+    writeContract,
+    isBusy,
+    isSuccess,
+    status: txStatus,
+    errorMessage: txError,
+    setPendingStatus,
+  } = useWriteContractFeedback();
 
   const [listings, setListings] = useState<MarketListing[]>([]);
+  const [invalidCount, setInvalidCount] = useState(0);
   const [signedCount, setSignedCount] = useState(0);
   const [onchainCount, setOnchainCount] = useState(0);
   const [importedFeeds, setImportedFeeds] = useState<SignedListingFeedV1[]>([]);
@@ -69,30 +80,43 @@ export function MarketplacePanel() {
   const [marketplaceFeeRecipient, setMarketplaceFeeRecipient] = useState<Address>(zeroAddress);
   const [payoutPreviews, setPayoutPreviews] = useState<Record<string, PayoutPreview>>({});
   const [payoutErrors, setPayoutErrors] = useState<Record<string, string>>({});
+  const [discoveryError, setDiscoveryError] = useState("");
 
   const refreshListings = useCallback(async () => {
     if (!publicClient || !marketAddress || !chainId) {
       setListings([]);
       setSignedCount(0);
       setOnchainCount(0);
+      setInvalidCount(0);
       return;
     }
 
-    const localFeeds = loadAllLocalFeeds(chainId, address);
-    const mergedLocal = mergeLocalFeeds(localFeeds);
-    const signedFeeds = [...(mergedLocal ? [mergedLocal] : []), ...remoteFeeds, ...importedFeeds];
+    setDiscoveryError("");
 
-    const inventory = await getMarketInventory({
-      publicClient,
-      marketAddress,
-      chainId,
-      signedFeeds,
-      conflictPolicy: "include-all",
-    });
+    try {
+      const localFeeds = loadAllLocalFeeds(chainId, address);
+      const mergedLocal = mergeLocalFeeds(localFeeds);
+      const signedFeeds = [...(mergedLocal ? [mergedLocal] : []), ...remoteFeeds, ...importedFeeds];
 
-    setListings(inventory.listings.filter((listing) => listing.valid));
-    setOnchainCount(inventory.onchain.filter((listing) => listing.valid).length);
-    setSignedCount(inventory.signed.filter((listing) => listing.valid).length);
+      const inventory = await getMarketInventory({
+        publicClient,
+        marketAddress,
+        chainId,
+        signedFeeds,
+        conflictPolicy: "include-all",
+      });
+
+      setListings(inventory.listings.filter((listing) => listing.valid));
+      setInvalidCount(inventory.totalCount - inventory.validCount);
+      setOnchainCount(inventory.onchain.filter((listing) => listing.valid).length);
+      setSignedCount(inventory.signed.filter((listing) => listing.valid).length);
+    } catch (error) {
+      setDiscoveryError(formatPanelError(error, "Unable to load marketplace inventory."));
+      setListings([]);
+      setInvalidCount(0);
+      setSignedCount(0);
+      setOnchainCount(0);
+    }
   }, [address, chainId, importedFeeds, marketAddress, publicClient, remoteFeeds]);
 
   const refreshPayoutPreviews = useCallback(async () => {
@@ -150,7 +174,7 @@ export function MarketplacePanel() {
     }
   }, [address, marketplaceFeeRecipient]);
 
-  const isBusy = isPending || isConfirming;
+  const displayStatus = txError || status || txStatus;
 
   function buyListing(listing: MarketListing) {
     if (!marketAddress) {
@@ -172,7 +196,7 @@ export function MarketplacePanel() {
         args: [listing.listingId, marketplaceFeeRecipient, marketplaceFeeBps],
         value: listing.price,
       });
-      setStatus(`Buying onchain listing #${listing.listingId.toString()}...`);
+      setPendingStatus(`Buying onchain listing #${listing.listingId.toString()}...`);
       return;
     }
 
@@ -183,7 +207,7 @@ export function MarketplacePanel() {
       args: [listing.listing, listing.signature, marketplaceFeeRecipient, marketplaceFeeBps],
       value: normalized.price,
     });
-    setStatus(`Buying signed listing for token #${normalized.tokenId.toString()}...`);
+    setPendingStatus(`Buying signed listing for token #${normalized.tokenId.toString()}...`);
   }
 
   if (!marketAddress) {
@@ -210,9 +234,10 @@ export function MarketplacePanel() {
 
       <p className="text-muted-foreground text-xs">
         Unified inventory: {onchainCount} onchain, {signedCount} signed (valid only).
+        {invalidCount > 0 ? ` ${invalidCount} invalid or stale listing(s) hidden.` : null}
       </p>
 
-      {status ? <p className="text-sm">{status}</p> : null}
+      <StatusMessage message={displayStatus} error={discoveryError || undefined} />
 
       {chainId ? (
         <FeedIngestionPanel
@@ -222,7 +247,11 @@ export function MarketplacePanel() {
             if (feeds.length > 1) {
               try {
                 setImportedFeeds([mergeSignedFeeds(feeds)]);
-              } catch {
+              } catch (error) {
+                console.warn("[sutrart] mergeSignedFeeds failed in marketplace ingest panel.", {
+                  chainId,
+                  error: error instanceof Error ? error.message : String(error),
+                });
                 setImportedFeeds(feeds);
               }
             } else {
@@ -277,12 +306,14 @@ export function MarketplacePanel() {
             const normalized = getNormalizedListingFields(listing);
             return (
               <div key={key} className="space-y-3 rounded-lg border border-border p-4">
-                <p className="font-mono text-sm">
-                  {listing.kind === "onchain"
-                    ? `Onchain listing #${listing.listingId.toString()}`
-                    : "Signed listing"}
-                </p>
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">{listing.kind}</p>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-mono text-sm">
+                    {listing.kind === "onchain"
+                      ? `Onchain listing #${listing.listingId.toString()}`
+                      : "Signed listing"}
+                  </p>
+                  <ListingValidityBadge listing={listing} />
+                </div>
                 <p className="text-sm text-muted-foreground">Seller: {normalized.seller}</p>
                 <p className="text-sm text-muted-foreground">
                   Token #{normalized.tokenId.toString()} on {normalized.nftContract}
@@ -302,8 +333,11 @@ export function MarketplacePanel() {
                   }
                   onClick={() => buyListing(listing)}
                 >
-                  Buy listing
+                  {isBusy ? "Processing..." : "Buy listing"}
                 </Button>
+                {address?.toLowerCase() === normalized.seller.toLowerCase() ? (
+                  <p className="text-xs text-muted-foreground">You cannot buy your own listing.</p>
+                ) : null}
               </div>
             );
           })}

@@ -32,8 +32,13 @@ export async function loadSyndicatedSignedFeeds(options?: {
   if (remoteFeedUrl) {
     try {
       feeds.push(await fetchSignedListingFeed(remoteFeedUrl));
-    } catch {
+    } catch (error) {
       // Ignore unreachable configured feed URLs during server assembly.
+      console.warn("[sutrart] Remote signed listing feed fetch failed.", {
+        url: remoteFeedUrl,
+        chainId: options?.chainId,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 
@@ -42,8 +47,13 @@ export async function loadSyndicatedSignedFeeds(options?: {
     for (const url of urls) {
       try {
         feeds.push(await fetchSignedListingFeed(url));
-      } catch {
+      } catch (error) {
         // Ignore unreachable marketplace feed URLs.
+        console.warn("[sutrart] Marketplace feed fetch failed.", {
+          url,
+          chainId: options?.chainId,
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
     }
   }

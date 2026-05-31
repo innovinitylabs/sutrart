@@ -1,5 +1,6 @@
 import type { Address, PublicClient } from "viem";
 import { getAddress, isAddress, zeroAddress } from "viem";
+import { SUTRART_PROTOCOL_VERSION } from "@sutrart/shared";
 import { listingLookupKey } from "./inventory";
 import {
   discoverSignedMarketListings,
@@ -12,7 +13,7 @@ import {
 import { hashSignedListing, isSignedListingValid, type SignedListing } from "./signedListing";
 
 export const SIGNED_LISTING_FEED_VERSION = 1 as const;
-export const SUTRART_PROTOCOL_VERSION = "1" as const;
+export { SUTRART_PROTOCOL_VERSION } from "@sutrart/shared";
 
 export type SignedListingFeedMetadata = {
   creator: Address;

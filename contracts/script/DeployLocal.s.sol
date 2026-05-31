@@ -13,6 +13,8 @@ contract DeployLocal is DeploySutrartBase {
 
         vm.stopBroadcast();
 
+        logDeploymentSummary(deployment);
+
         writeDeploymentManifest(
             "anvil",
             "../packages/shared/src/deployments/local.json",

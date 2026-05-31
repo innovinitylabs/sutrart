@@ -1,4 +1,5 @@
 import type { ListingProvenance } from "@sutrart/sdk";
+import { SUTRART_PROTOCOL_VERSION } from "@sutrart/shared";
 import { zeroAddress } from "viem";
 
 export function ListingProvenancePanel({ provenance }: { provenance: ListingProvenance }) {
@@ -33,6 +34,10 @@ export function ListingProvenancePanel({ provenance }: { provenance: ListingProv
         <div className="flex justify-between gap-4">
           <dt>Listing source</dt>
           <dd className="font-mono text-foreground">{provenance.listingSource ?? "Unknown"}</dd>
+        </div>
+        <div className="flex justify-between gap-4">
+          <dt>Protocol</dt>
+          <dd className="font-mono text-foreground">{SUTRART_PROTOCOL_VERSION}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>Settlement</dt>

@@ -5,8 +5,6 @@ import { formatEther, parseEther, zeroAddress, type Address } from "viem";
 import {
   useAccount,
   usePublicClient,
-  useWaitForTransactionReceipt,
-  useWriteContract,
 } from "wagmi";
 import {
   abis,
@@ -16,8 +14,11 @@ import {
 } from "@sutrart/sdk";
 import { CreatorSignedListingsPanel } from "@/components/creator-signed-listings-panel";
 import { ChainStatus } from "@/components/chain-status";
+import { StatusMessage } from "@/components/status-message";
 import { Button } from "@/components/ui/button";
+import { formatPanelError } from "@/components/status-message";
 import { useContractAddresses } from "@/lib/contracts";
+import { useWriteContractFeedback } from "@/lib/use-write-contract-feedback";
 
 type CollectionForm = {
   name: string;
@@ -31,8 +32,8 @@ type CollectionForm = {
 const defaultForm: CollectionForm = {
   name: "",
   symbol: "",
-  baseURI: "https://example.com/metadata/",
-  contractURI: "https://example.com/collection.json",
+  baseURI: "ipfs://your-collection-metadata/",
+  contractURI: "ipfs://your-collection.json",
   royaltyRecipient: zeroAddress,
   royaltyBps: "500",
 };
@@ -41,13 +42,21 @@ export function CreatorPanel() {
   const { address, isConnected } = useAccount();
   const publicClient = usePublicClient();
   const { marketAddress } = useContractAddresses();
-  const { writeContract, data: txHash, isPending } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
+  const {
+    writeContract,
+    isBusy,
+    isSuccess,
+    status: txStatus,
+    errorMessage: txError,
+    setPendingStatus,
+  } = useWriteContractFeedback();
 
   const [form, setForm] = useState<CollectionForm>(defaultForm);
   const [inventory, setInventory] = useState<CreatorInventory | null>(null);
   const [priceByToken, setPriceByToken] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<string>("");
+  const [inventoryError, setInventoryError] = useState<string>("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const refreshInventory = useCallback(async () => {
     if (!publicClient || !marketAddress || !address) {
@@ -55,8 +64,18 @@ export function CreatorPanel() {
       return;
     }
 
-    const nextInventory = await getCreatorInventory(publicClient, marketAddress, address);
-    setInventory(nextInventory);
+    setIsRefreshing(true);
+    setInventoryError("");
+
+    try {
+      const nextInventory = await getCreatorInventory(publicClient, marketAddress, address);
+      setInventory(nextInventory);
+    } catch (error) {
+      setInventoryError(formatPanelError(error, "Unable to load creator inventory."));
+      setInventory(null);
+    } finally {
+      setIsRefreshing(false);
+    }
   }, [address, marketAddress, publicClient]);
 
   useEffect(() => {
@@ -69,7 +88,7 @@ export function CreatorPanel() {
     }
   }, [address, form.royaltyRecipient]);
 
-  const isBusy = isPending || isConfirming;
+  const displayStatus = txError || status || txStatus;
 
   const collectionCount = inventory?.collections.length ?? 0;
   const tokenCount = inventory?.tokens.length ?? 0;
@@ -107,7 +126,7 @@ export function CreatorPanel() {
         BigInt(form.royaltyBps || "0"),
       ],
     });
-    setStatus("Deploying ERC721RT collection...");
+    setPendingStatus("Deploying ERC721RT collection...");
   }
 
   function mintToken(collectionAddress: Address) {
@@ -121,7 +140,7 @@ export function CreatorPanel() {
       functionName: "mint",
       args: [address],
     });
-    setStatus(`Minting token on ${collectionAddress}...`);
+    setPendingStatus(`Minting token on ${collectionAddress}...`);
   }
 
   function approveMarket(token: InventoryToken) {
@@ -135,7 +154,7 @@ export function CreatorPanel() {
       functionName: "approve",
       args: [marketAddress, token.tokenId],
     });
-    setStatus(`Approving token #${token.tokenId.toString()} for marketplace...`);
+    setPendingStatus(`Approving token #${token.tokenId.toString()} for marketplace...`);
   }
 
   function listToken(token: InventoryToken) {
@@ -151,7 +170,7 @@ export function CreatorPanel() {
       functionName: "listNFT",
       args: [token.collection, token.tokenId, parseEther(price)],
     });
-    setStatus(`Listing token #${token.tokenId.toString()} for ${price} ETH...`);
+    setPendingStatus(`Listing token #${token.tokenId.toString()} for ${price} ETH...`);
   }
 
   function cancelListing(token: InventoryToken) {
@@ -165,7 +184,7 @@ export function CreatorPanel() {
       functionName: "cancelListing",
       args: [token.listingState.listingId],
     });
-    setStatus(`Cancelling listing #${token.listingState.listingId.toString()}...`);
+    setPendingStatus(`Cancelling listing #${token.listingState.listingId.toString()}...`);
   }
 
   const collectionCards = useMemo(() => inventory?.collections ?? [], [inventory]);
@@ -265,12 +284,12 @@ export function CreatorPanel() {
               Chain-native inventory across your ERC721RT collections.
             </p>
           </div>
-          <Button type="button" variant="outline" disabled={isBusy} onClick={() => void refreshInventory()}>
-            Refresh
+          <Button type="button" variant="outline" disabled={isBusy || isRefreshing} onClick={() => void refreshInventory()}>
+            {isRefreshing ? "Refreshing..." : "Refresh"}
           </Button>
         </div>
 
-        {status ? <p className="text-sm">{status}</p> : null}
+        <StatusMessage message={displayStatus} error={inventoryError || undefined} />
 
         {!inventory || inventory.collections.length === 0 ? (
           <p className="text-muted-foreground text-sm">No collections deployed yet.</p>

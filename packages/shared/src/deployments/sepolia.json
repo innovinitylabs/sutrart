@@ -1,9 +1,19 @@
 {
+  "SutrartMarket": "0x03fD2aac3bC00320C40A90C85Fc817A4756BaaEE",
   "chainId": 11155111,
   "chainName": "sepolia",
-  "protocolVersion": "1",
-  "gitCommit": "undeployed",
-  "deployedAt": 0,
-  "SutrartMarket": "0x0000000000000000000000000000000000000000",
-  "facets": {}
+  "deployedAt": 1779822984,
+  "facets": {
+    "DiamondCutFacet": "0x56D2D48A7FD0Ce48Ef834940A7892724c2Ee4AEF",
+    "DiamondLoupeFacet": "0x7700bd753E0b6d92642b0c6Fa1E0d53B504e2ccC",
+    "ERC721RTFactoryFacet": "0x4D51F452a0972c6e16222688b60E007f61DEC23b",
+    "ListingFacet": "0xb845cDB14baa55BD0142a8123763D4b60c2844eE",
+    "OwnershipFacet": "0x08573FE10F76ed3111762E15743f57E178c8778f",
+    "ProtocolConfigFacet": "0x9B3D45d6e9f5A38A746Abc51E739605fFed92463",
+    "SettlementFacet": "0x4F644dB90E3cB0a6D879587ce6383c23220AFFE9",
+    "SignedListingFacet": "0x4163418242b7C02baB40E728772a3ba5CfdCebA6",
+    "ViewFacet": "0x77c0F87621B7509eD76Bb78ce39eEaD9E98E6670"
+  },
+  "gitCommit": "39977f2b02ed92318e8db2c8927d435a2b1af484",
+  "protocolVersion": "v0.1-alpha"
 }

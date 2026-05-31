@@ -30,7 +30,19 @@ export function CreatorStorefrontSyndication({ creatorAddress }: { creatorAddres
       return;
     }
 
-    void getCreatorSignedListings(publicClient, marketAddress, creator, [feed]).then(setEntries);
+    void (async () => {
+      try {
+        const next = await getCreatorSignedListings(publicClient, marketAddress, creator, [feed]);
+        setEntries(next);
+      } catch (error) {
+        console.warn("[sutrart] Creator storefront syndication failed.", {
+          chainId,
+          creator,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        setEntries([]);
+      }
+    })();
   }, [chainId, creatorAddress, marketAddress, publicClient]);
 
   const active = entries.filter((entry) => entry.valid);

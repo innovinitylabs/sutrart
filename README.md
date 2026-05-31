@@ -1,16 +1,29 @@
 # Sutrart
 
-Sutrart is a sovereign NFT listing and settlement protocol for Ethereum. Artists retain custody of their NFTs; listings are fully onchain; and marketplaces act as interfaces rather than escrow owners.
+Sutrart is a sovereign NFT listing and settlement protocol for Ethereum. Creators retain custody of NFTs, publish portable signed listing feeds, and share a chain-native settlement engine.
+
+**Public alpha:** `v0.1-alpha` on Ethereum Sepolia (see [docs/deployment.md](./docs/deployment.md))
 
 ## Core principles
 
-- Artists retain custody of NFTs
-- No escrow marketplaces
-- Listings are fully onchain (V1)
-- One listing works across multiple marketplaces
-- Listings invalidate globally after sale
-- Artist-controlled royalties and composable marketplace fees
-- Minimal, auditable protocol; no backend or database for V1
+- Creator sovereignty over collections and liquidity
+- No centralized orderbook or marketplace backend
+- Onchain listings + EIP-712 signed listings
+- Shared Diamond settlement with runtime validation
+- Portable feed syndication for discovery surfaces
+
+## Documentation
+
+| Doc | Description |
+| --- | --- |
+| [Protocol overview](./docs/protocol-overview.md) | Architecture and philosophy |
+| [Creator flow](./docs/creator-flow.md) | End-to-end creator workflow |
+| [Signed listings](./docs/signed-listings.md) | EIP-712 feeds and validation |
+| [Storefronts](./docs/storefronts.md) | Sovereign storefront surfaces |
+| [Marketplace integration](./docs/marketplace-integration.md) | Feed ingestion + settlement |
+| [Deployment](./docs/deployment.md) | Anvil + Sepolia deploy runbook |
+| [Security review](./docs/security-review.md) | Alpha assumptions and limits |
+| [Gas observations](./docs/gas-observations.md) | Indicative gas notes |
 
 ## Prerequisites
 
@@ -35,7 +48,18 @@ pnpm contracts:deploy:local
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000), connect wallet to Anvil (chain 31337), then use **My NFTs** and **Marketplace**.
+Open [http://localhost:3000](http://localhost:3000), connect wallet to Anvil (chain 31337), then use **Creator** and **Marketplace**.
+
+### Sepolia alpha
+
+```bash
+# Configure SEPOLIA_RPC_URL + DEPLOYER_PRIVATE_KEY in .env
+pnpm contracts:deploy:sepolia
+
+# app/.env.local
+NEXT_PUBLIC_DEFAULT_CHAIN_ID=11155111
+pnpm dev
+```
 
 ## Monorepo layout
 
@@ -61,7 +85,10 @@ Open [http://localhost:3000](http://localhost:3000), connect wallet to Anvil (ch
 | `pnpm contracts:test`         | `forge test`                      |
 | `pnpm contracts:fmt`          | `forge fmt`                       |
 | `pnpm contracts:anvil`        | Start local Anvil node            |
-| `pnpm contracts:deploy:local` | Deploy to Anvil + write addresses |
+| `pnpm contracts:deploy:local` | Deploy to Anvil + write manifest |
+| `pnpm contracts:deploy:sepolia` | Deploy to Sepolia + validate manifest |
+| `pnpm manifest:validate` | Validate a deployment manifest JSON |
+| `pnpm sdk:test` | Run SDK unit tests |
 
 ## Environment variables
 
@@ -71,6 +98,10 @@ Copy `.env.example` to `app/.env.local`:
 | -------------------------------------- | ----------------- | ---------------------------------------------------- |
 | `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | Yes (for wallets) | WalletConnect Cloud project ID                       |
 | `NEXT_PUBLIC_APP_URL`                  | No                | Canonical app URL (default: `http://localhost:3000`) |
+| `NEXT_PUBLIC_DEFAULT_CHAIN_ID`         | No                | SSR/wallet default chain (`31337` or `11155111`)     |
+| `NEXT_PUBLIC_SIGNED_LISTING_FEED_URL`  | No                | Hosted creator feed for SSR syndication              |
+| `SEPOLIA_RPC_URL`                      | Sepolia deploy    | Sepolia RPC endpoint                                 |
+| `DEPLOYER_PRIVATE_KEY`                 | Sepolia deploy    | Deployer private key                                 |
 
 ## Not included in this scaffold
 

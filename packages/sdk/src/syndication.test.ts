@@ -37,7 +37,7 @@ function sampleFeed(orders = [sampleOrder(1n, 100n, 0n, 0n)]): SignedListingFeed
       creator,
       generatedAt: 1_700_000_000_000,
       chainId: 11155111,
-      protocolVersion: "1",
+      protocolVersion: "v0.1-alpha",
       storefrontUrl: "https://example.com/creator/0x1",
     },
     orders,
@@ -110,6 +110,6 @@ describe("sepolia deployment config", () => {
     const feed = sampleFeed();
     expect(feed.chainId).toBe(11155111);
     expect(feed.chainName).toBe("sepolia");
-    expect(feed.metadata?.protocolVersion).toBe("1");
+    expect(feed.metadata?.protocolVersion).toBe("v0.1-alpha");
   });
 });

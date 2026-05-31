@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {Script} from "forge-std/Script.sol";
+import {Script, console2} from "forge-std/Script.sol";
 import {IDiamondCut} from "../src/diamond/interfaces/IDiamondCut.sol";
 import {IDiamondLoupe} from "../src/diamond/interfaces/IDiamondLoupe.sol";
 import {Diamond} from "../src/diamond/Diamond.sol";
@@ -19,6 +19,7 @@ import {ISutrartMarket} from "../src/interfaces/ISutrartMarket.sol";
 import {SutrartInit} from "../src/SutrartInit.sol";
 
 abstract contract DeploySutrartBase is Script {
+    string internal constant PROTOCOL_VERSION = "v0.1-alpha";
     struct DeploymentFacets {
         address diamondCutFacet;
         address diamondLoupeFacet;
@@ -72,6 +73,31 @@ abstract contract DeploySutrartBase is Script {
 
         bytes memory initCalldata = abi.encodeWithSelector(SutrartInit.init.selector, owner);
         IDiamondCut(address(result.diamond)).diamondCut(cut, address(init), initCalldata);
+
+        assertDeploymentSanity(result);
+    }
+
+    function assertDeploymentSanity(DeploymentResult memory deployment) internal view {
+        IDiamondLoupe loupe = IDiamondLoupe(address(deployment.diamond));
+        address[] memory facetAddresses = loupe.facetAddresses();
+        require(facetAddresses.length >= 8, "DeploySutrartBase: expected at least 8 facets");
+
+        require(deployment.facets.signedListingFacet != address(0), "DeploySutrartBase: signed listing facet missing");
+        require(deployment.facets.listingFacet != address(0), "DeploySutrartBase: listing facet missing");
+        require(deployment.facets.settlementFacet != address(0), "DeploySutrartBase: settlement facet missing");
+        require(deployment.facets.erc721rtFactoryFacet != address(0), "DeploySutrartBase: factory facet missing");
+
+        bytes32 domainSeparator = ISutrartMarket(address(deployment.diamond)).domainSeparator();
+        require(domainSeparator != bytes32(0), "DeploySutrartBase: domain separator unset");
+    }
+
+    function logDeploymentSummary(DeploymentResult memory deployment) internal view {
+        console2.log("Sutrart deployment sanity checks passed");
+        console2.log("Protocol version:", PROTOCOL_VERSION);
+        console2.log("Chain ID:", block.chainid);
+        console2.log("Diamond:", address(deployment.diamond));
+        console2.log("SignedListingFacet:", deployment.facets.signedListingFacet);
+        console2.log("ERC721RTFactoryFacet:", deployment.facets.erc721rtFactoryFacet);
     }
 
     function writeDeploymentManifest(
@@ -85,7 +111,7 @@ abstract contract DeploySutrartBase is Script {
         string memory root = "deployment";
         vm.serializeUint(root, "chainId", block.chainid);
         vm.serializeString(root, "chainName", chainName);
-        vm.serializeString(root, "protocolVersion", "1");
+        vm.serializeString(root, "protocolVersion", PROTOCOL_VERSION);
         vm.serializeString(root, "gitCommit", gitCommit);
         vm.serializeUint(root, "deployedAt", block.timestamp);
         vm.serializeAddress(root, "SutrartMarket", address(deployment.diamond));

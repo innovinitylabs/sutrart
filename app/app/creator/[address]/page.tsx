@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getAddress, isAddress } from "viem";
 import { getCreatorStorefront } from "@sutrart/sdk";
-import { defaultChain } from "@sutrart/shared";
+import { getDefaultChainId, SUTRART_PROTOCOL_VERSION } from "@sutrart/shared";
 import { Nav } from "@/components/nav";
 import { CollectionGrid } from "@/components/storefront/collection-grid";
 import { CreatorStorefrontSyndication } from "@/components/creator-storefront-syndication";
@@ -21,8 +21,9 @@ export default async function CreatorStorefrontPage({ params }: PageProps) {
   }
 
   const creator = getAddress(rawAddress);
-  const publicClient = getServerPublicClient();
-  const marketAddress = getServerMarketAddress();
+  const chainId = getDefaultChainId();
+  const publicClient = getServerPublicClient(chainId);
+  const marketAddress = getServerMarketAddress(chainId);
 
   if (!marketAddress) {
     return (
@@ -30,8 +31,8 @@ export default async function CreatorStorefrontPage({ params }: PageProps) {
         <Nav />
         <main className="mx-auto w-full max-w-4xl px-6 py-10">
           <p className="text-sm text-muted-foreground">
-            Local contract addresses are missing. Run `pnpm contracts:anvil` and `pnpm
-            contracts:deploy:local`.
+            No deployment manifest found for chain {chainId}. Deploy locally or to Sepolia, then set
+            NEXT_PUBLIC_DEFAULT_CHAIN_ID if needed.
           </p>
         </main>
       </div>
@@ -39,14 +40,14 @@ export default async function CreatorStorefrontPage({ params }: PageProps) {
   }
 
   const signedFeeds = await loadSyndicatedSignedFeeds({
-    chainId: defaultChain.id,
+    chainId,
     creator,
   });
   const storefront = await getCreatorStorefront({
     publicClient,
     marketAddress,
     creator,
-    chainId: defaultChain.id,
+    chainId,
     signedFeeds,
   });
 
@@ -60,6 +61,7 @@ export default async function CreatorStorefrontPage({ params }: PageProps) {
           <p className="text-sm text-muted-foreground">
             Sovereign inventory surface for collections, onchain listings, and signed liquidity.
           </p>
+          <p className="text-xs text-muted-foreground">Protocol {SUTRART_PROTOCOL_VERSION}</p>
         </div>
 
         <section className="space-y-4">

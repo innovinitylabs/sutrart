@@ -46,7 +46,11 @@ export default async function CollectionStorefrontPage({ params }: PageProps) {
       collection,
       signedFeeds,
     });
-  } catch {
+  } catch (error) {
+    console.warn("[sutrart] Collection storefront rendering failed.", {
+      collection,
+      error: error instanceof Error ? error.message : String(error),
+    });
     notFound();
   }
 
