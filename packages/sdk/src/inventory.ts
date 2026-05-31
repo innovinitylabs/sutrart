@@ -3,13 +3,13 @@ import type { Address, PublicClient } from "viem";
 import {
   getCollectionOwnedTokenIds,
   getCreatorCollections,
-} from "./collection";
+} from "./collection.js";
 import {
   getListing,
   getNextListingId,
   isListingValid,
   type Listing,
-} from "./market";
+} from "./market.js";
 
 export type TokenListingState = {
   isListed: boolean;

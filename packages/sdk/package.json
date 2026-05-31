@@ -14,7 +14,8 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint src/",
-    "test": "vitest run"
+    "test": "vitest run",
+    "validate:sepolia": "node scripts/sepolia-validation.mjs"
   },
   "dependencies": {
     "@pari/abi": "workspace:*",

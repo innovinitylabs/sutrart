@@ -1,5 +1,5 @@
-import localDeployments from "./deployments/local.json";
-import sepoliaDeployments from "./deployments/sepolia.json";
+import localDeployments from "./deployments/local.json" with { type: "json" };
+import sepoliaDeployments from "./deployments/sepolia.json" with { type: "json" };
 
 export type DeploymentFacets = {
   DiamondCutFacet?: `0x${string}`;

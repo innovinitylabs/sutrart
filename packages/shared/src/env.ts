@@ -40,3 +40,12 @@ export function getSignedListingFeedUrl(): string | undefined {
   const url = readPublicEnv("NEXT_PUBLIC_SIGNED_LISTING_FEED_URL");
   return url && url.length > 0 ? url : undefined;
 }
+
+/** Server-side Sepolia RPC for SSR storefront reads. Falls back to viem chain defaults. */
+export function getSepoliaRpcUrl(): string | undefined {
+  if (typeof process === "undefined") {
+    return undefined;
+  }
+  const url = process.env.SEPOLIA_RPC_URL;
+  return url && url.length > 0 ? url : undefined;
+}

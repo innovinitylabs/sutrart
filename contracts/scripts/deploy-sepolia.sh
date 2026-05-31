@@ -15,6 +15,13 @@ ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 CONTRACTS_DIR="$(dirname "$0")/.."
 MANIFEST_PATH="${ROOT_DIR}/packages/shared/src/deployments/sepolia.json"
 
+if [[ -f "${ROOT_DIR}/.env" ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source "${ROOT_DIR}/.env"
+  set +a
+fi
+
 export GIT_COMMIT="${GIT_COMMIT:-$(git -C "${ROOT_DIR}" rev-parse HEAD)}"
 
 echo "Deploying PARI Diamond to Sepolia..."

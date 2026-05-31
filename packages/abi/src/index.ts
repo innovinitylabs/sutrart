@@ -1,7 +1,7 @@
-import { pariMarketAbi } from "./generated/pariMarketAbi";
-import { mockErc721Abi } from "./generated/mockErc721Abi";
-import { erc721rtAbi } from "./generated/erc721rtAbi";
-import { erc721rtFactoryAbi } from "./generated/erc721rtFactoryAbi";
+import { pariMarketAbi } from "./generated/pariMarketAbi.js";
+import { mockErc721Abi } from "./generated/mockErc721Abi.js";
+import { erc721rtAbi } from "./generated/erc721rtAbi.js";
+import { erc721rtFactoryAbi } from "./generated/erc721rtFactoryAbi.js";
 
 export { pariMarketAbi, mockErc721Abi, erc721rtAbi, erc721rtFactoryAbi };
 

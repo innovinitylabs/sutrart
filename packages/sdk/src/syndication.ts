@@ -1,7 +1,7 @@
 import type { Address, PublicClient } from "viem";
 import { getAddress, isAddress, zeroAddress } from "viem";
 import { PARI_PROTOCOL_VERSION } from "@pari/shared";
-import { listingLookupKey } from "./inventory";
+import { listingLookupKey } from "./inventory.js";
 import {
   discoverSignedMarketListings,
   parseSignedListingFeed,
@@ -9,8 +9,8 @@ import {
   type SignedListingFeed,
   type SignedListingOrder,
   type SignedMarketListing,
-} from "./discovery";
-import { hashSignedListing, isSignedListingValid, type SignedListing } from "./signedListing";
+} from "./discovery.js";
+import { hashSignedListing, isSignedListingValid, type SignedListing } from "./signedListing.js";
 
 export const SIGNED_LISTING_FEED_VERSION = 1 as const;
 export { PARI_PROTOCOL_VERSION } from "@pari/shared";

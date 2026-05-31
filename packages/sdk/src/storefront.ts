@@ -1,7 +1,7 @@
 import { abis } from "@pari/abi";
 import type { Address, PublicClient } from "viem";
 import { getAddress, isAddress, zeroAddress } from "viem";
-import { getCollectionCreator } from "./collection";
+import { getCollectionCreator } from "./collection.js";
 import {
   discoverSignedMarketListings,
   getMarketInventory,
@@ -14,15 +14,15 @@ import {
   type SignedListingFeed,
   type SignedListingOrder,
   type SignedMarketListing,
-} from "./discovery";
-import { hashSignedListing } from "./signedListing";
-import { getCreatorInventory, listingLookupKey, type InventoryToken } from "./inventory";
-import { getListing, isListingValid, type PayoutPreview } from "./market";
+} from "./discovery.js";
+import { hashSignedListing } from "./signedListing.js";
+import { getCreatorInventory, listingLookupKey, type InventoryToken } from "./inventory.js";
+import { getListing, isListingValid, type PayoutPreview } from "./market.js";
 import {
   getNormalizedCollectionMetadata,
   getTokenURI,
   type NormalizedCollectionMetadata,
-} from "./metadata";
+} from "./metadata.js";
 
 export type ListingProvenance = {
   listingType: "onchain" | "signed";

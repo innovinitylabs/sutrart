@@ -1,6 +1,6 @@
 import { isAddress } from "viem";
-import { PARI_PROTOCOL_VERSION } from "./constants";
-import type { DeploymentFacets, DeploymentManifest } from "./deployments";
+import { PARI_PROTOCOL_VERSION } from "./constants.js";
+import type { DeploymentFacets, DeploymentManifest } from "./deployments.js";
 
 const REQUIRED_FACETS: (keyof DeploymentFacets)[] = [
   "DiamondCutFacet",

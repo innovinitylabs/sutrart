@@ -14,8 +14,8 @@ export {
   type Listing,
   type PayoutPreview,
   type ProtocolFeeConfig,
-} from "./market";
-export { getNextTokenId, getOwnedTokenIds, isApprovedForMarket } from "./nft";
+} from "./market.js";
+export { getNextTokenId, getOwnedTokenIds, isApprovedForMarket } from "./nft.js";
 export {
   buildCreateCollectionArgs,
   createCollection,
@@ -27,7 +27,7 @@ export {
   mintCollectionToken,
   type CollectionWriteClients,
   type CreateCollectionParams,
-} from "./collection";
+} from "./collection.js";
 export {
   buildActiveListingIndex,
   getCollectionTokens,
@@ -39,7 +39,7 @@ export {
   type InventoryCollection,
   type InventoryToken,
   type TokenListingState,
-} from "./inventory";
+} from "./inventory.js";
 export {
   discoverOnchainMarketListings,
   discoverSignedMarketListings,
@@ -66,7 +66,7 @@ export {
   type SignedListingFeed,
   type SignedListingOrder,
   type SignedMarketListing,
-} from "./discovery";
+} from "./discovery.js";
 export {
   fetchCollectionMetadataDocument,
   getCollectionChainMetadata,
@@ -75,7 +75,7 @@ export {
   normalizeCollectionMetadataDocument,
   type CollectionMetadataDocument,
   type NormalizedCollectionMetadata,
-} from "./metadata";
+} from "./metadata.js";
 export {
   buildCollectionStorefrontPath,
   buildCreatorStorefrontPath,
@@ -99,7 +99,7 @@ export {
   type ListingProvenance,
   type StorefrontParams,
   type StorefrontToken,
-} from "./storefront";
+} from "./storefront.js";
 export {
   getDomainSeparator,
   getSignedListingMinNonce,
@@ -110,7 +110,7 @@ export {
   SIGNED_LISTING_EIP712_TYPES,
   PARI_EIP712_DOMAIN,
   type SignedListing,
-} from "./signedListing";
+} from "./signedListing.js";
 export {
   buildRevokeSignedListingsTransaction,
   buildSignedListingDraft,
@@ -137,4 +137,4 @@ export {
   type SignedFeedValidationResult,
   type SignedListingFeedMetadata,
   type SignedListingFeedV1,
-} from "./syndication";
+} from "./syndication.js";

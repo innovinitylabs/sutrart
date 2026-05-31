@@ -1,10 +1,12 @@
 "use client";
 
-import { getContractAddress, isSupportedDeploymentChain } from "@pari/shared";
-import { useChainId } from "wagmi";
+import { getContractAddress, getDefaultChainId, isSupportedDeploymentChain } from "@pari/shared";
+import { useAccount, useChainId } from "wagmi";
 
 export function useContractAddresses() {
-  const chainId = useChainId();
+  const { isConnected } = useAccount();
+  const walletChainId = useChainId();
+  const chainId = isConnected ? walletChainId : getDefaultChainId();
 
   return {
     chainId,

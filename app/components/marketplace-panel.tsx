@@ -15,6 +15,7 @@ import {
   type PayoutPreview,
   type SignedListingFeedV1,
 } from "@pari/sdk";
+import { getDefaultChainId } from "@pari/shared";
 import { ChainStatus } from "@/components/chain-status";
 import { FeedIngestionPanel } from "@/components/feed-ingestion-panel";
 import { ListingValidityBadge } from "@/components/listing-validity-badge";
@@ -55,9 +56,10 @@ function ListingPayoutBreakdown({
 }
 
 export function MarketplacePanel() {
-  const { address, isConnected, chainId } = useAccount();
+  const { address, isConnected } = useAccount();
   const publicClient = usePublicClient();
-  const { marketAddress } = useContractAddresses();
+  const { chainId: resolvedChainId, marketAddress } = useContractAddresses();
+  const chainId = isConnected ? resolvedChainId : getDefaultChainId();
   const {
     writeContract,
     isBusy,

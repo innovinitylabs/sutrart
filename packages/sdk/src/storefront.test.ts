@@ -5,7 +5,7 @@ import {
   normalizeOnchainListing,
   type OnchainMarketListing,
   type SignedMarketListing,
-} from "./discovery";
+} from "./discovery.js";
 import {
   buildCollectionStorefrontPath,
   buildCreatorStorefrontPath,
@@ -13,7 +13,7 @@ import {
   buildSignedListingPath,
   flattenSignedOrders,
   normalizeListingHashParam,
-} from "./storefront";
+} from "./storefront.js";
 
 describe("storefront path helpers", () => {
   it("builds canonical storefront paths", () => {

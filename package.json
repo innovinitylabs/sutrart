@@ -20,6 +20,7 @@
     "contracts:deploy:sepolia": "pnpm contracts:build && pnpm --filter @pari/contracts deploy:sepolia",
     "manifest:validate": "node scripts/validate-deployment-manifest.mjs packages/shared/src/deployments/sepolia.json",
     "manifest:validate:local": "node scripts/validate-deployment-manifest.mjs packages/shared/src/deployments/local.json",
+    "validate:sepolia": "pnpm --filter @pari/shared --filter @pari/abi --filter @pari/sdk run build && pnpm --filter @pari/sdk validate:sepolia",
     "sdk:test": "pnpm --filter @pari/sdk test"
   },
   "devDependencies": {

@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "chainId": 11155111,
+  "chainName": "sepolia",
+  "market": "0xa01451d6dc3340A1e75aB3221007F46e64EFAB31",
+  "metadata": {
+    "creator": "0x7Bc9427C8730b87Ab3faD10DA63F0C4b9e9E0A5F",
+    "storefrontUrl": "http://localhost:3000/creator/0x7Bc9427C8730b87Ab3faD10DA63F0C4b9e9E0A5F",
+    "generatedAt": 1780235089034,
+    "chainId": 11155111,
+    "protocolVersion": "v0.1-alpha"
+  },
+  "orders": [
+    {
+      "listing": {
+        "seller": "0x7Bc9427C8730b87Ab3faD10DA63F0C4b9e9E0A5F",
+        "nftContract": "0xa05344Dc0957d38725A77f7d274d8562071113Cd",
+        "tokenId": "2",
+        "price": "10000000000000000",
+        "expiry": "1782827089",
+        "nonce": "0"
+      },
+      "signature": "0x3997f45b6b933978f1e53cbfc6662367c141db809dad651eed0a75da257f659852d56fbc177d8ef8f9393d5cc1f7d1359c961368d4af3e4728175f7e06e552be1c",
+      "source": "sepolia-validation",
+      "publishedAt": 1780235089033
+    },
+    {
+      "listing": {
+        "seller": "0x7Bc9427C8730b87Ab3faD10DA63F0C4b9e9E0A5F",
+        "nftContract": "0xa05344Dc0957d38725A77f7d274d8562071113Cd",
+        "tokenId": "3",
+        "price": "10000000000000000",
+        "expiry": "1782827089",
+        "nonce": "0"
+      },
+      "signature": "0xf17a5bd493dbf529e58bb85004550ece15867791ab973a4493f738a7ba1f9bf2303d198c206390a5309b4c7cce8446158c2fdc74071c587413fa11a612d63c711c",
+      "source": "sepolia-validation",
+      "publishedAt": 1780235089033
+    }
+  ]
+}

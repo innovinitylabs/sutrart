@@ -1,18 +1,18 @@
 import type { Address, PublicClient } from "viem";
 import { getAddress, isAddress } from "viem";
-import { listingLookupKey } from "./inventory";
+import { listingLookupKey } from "./inventory.js";
 import {
   getValidListings,
   previewPayouts,
   type Listing,
   type PayoutPreview,
-} from "./market";
+} from "./market.js";
 import {
   hashSignedListing,
   isSignedListingValid,
   previewSignedPayouts,
   type SignedListing,
-} from "./signedListing";
+} from "./signedListing.js";
 
 export type ListingConflictPolicy = "prefer-onchain" | "prefer-signed" | "include-all";
 
