@@ -5,7 +5,7 @@ import {
   buildOnchainListingPath,
   buildSignedListingPath,
   type StorefrontToken,
-} from "@sutrart/sdk";
+} from "@pari/sdk";
 
 export function StorefrontInventorySection({
   title,

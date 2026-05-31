@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { parseEther } from "viem";
 import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { abis, getOwnedTokenIds, isApprovedForMarket } from "@sutrart/sdk";
+import { abis, getOwnedTokenIds, isApprovedForMarket } from "@pari/sdk";
 import { Button } from "@/components/ui/button";
 import { useContractAddresses } from "@/lib/contracts";
 
@@ -89,7 +89,7 @@ export function MyNftsPanel() {
     const price = priceByToken[tokenId.toString()] ?? "0.01";
     writeContract({
       address: marketAddress,
-      abi: abis.SutrartMarket,
+      abi: abis.PariMarket,
       functionName: "listNFT",
       args: [nftAddress, tokenId, parseEther(price)],
     });

@@ -1,6 +1,6 @@
 # Creator Flow
 
-End-to-end workflow for creators on Sutrart alpha (`v0.1-alpha`).
+End-to-end workflow for creators on PARI alpha (`v0.1-alpha`).
 
 ## Prerequisites
 
@@ -27,10 +27,10 @@ Use real metadata URIs before sharing storefront links publicly. Placeholder IPF
 
 ## 3. Approve the marketplace
 
-Before listing (onchain or signed), approve the Sutrart Diamond (`SutrartMarket`) to transfer the token:
+Before listing (onchain or signed), approve the PARI Diamond (`PariMarket`) to transfer the token:
 
 ```text
-ERC721RT.approve(SutrartMarket, tokenId)
+ERC721RT.approve(PariMarket, tokenId)
 ```
 
 Approval is required for settlement. Without it, listings appear invalid at purchase time.
@@ -55,7 +55,7 @@ Signed listings do not require an onchain list transaction. They require a valid
 Signed orders are appended to a deterministic JSON feed stored locally per creator:
 
 ```text
-sutrart:creator-feed:{chainId}:{creatorAddress}
+pari:creator-feed:{chainId}:{creatorAddress}
 ```
 
 Export the feed JSON and optionally host it at a public URL for cross-device syndication.

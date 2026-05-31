@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@rainbow-me/rainbowkit/styles.css";
-import { APP_NAME } from "@sutrart/shared";
+import { APP_NAME } from "@pari/shared";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: APP_NAME,
-  description: "Sovereign NFT listing and settlement protocol for Ethereum.",
+  description: "Creator sovereignty, cultural provenance, storefront, and syndication infrastructure.",
 };
 
 export default function RootLayout({

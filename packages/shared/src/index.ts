@@ -1,16 +1,18 @@
-export { APP_NAME, SUTRART_PROTOCOL_VERSION } from "./constants";
-export { defaultChain, getDefaultChain, supportedChains, type SupportedChain } from "./chains";
+export { APP_NAME, PARI_PROTOCOL_VERSION } from "./constants.js";
+export { PARI_BRAND, type PariBrand } from "./brand.js";
+export { defaultChain, getDefaultChain, supportedChains, type SupportedChain } from "./chains.js";
 export {
   getAppUrl,
   getDefaultChainId,
+  getSepoliaRpcUrl,
   getSignedListingFeedUrl,
   getWalletConnectProjectId,
-} from "./env";
+} from "./env.js";
 export {
   validateDeploymentManifest,
   type ManifestValidationIssue,
   type ManifestValidationResult,
-} from "./validate-manifest";
+} from "./validate-manifest.js";
 export {
   getContractAddress,
   getChainDisplayName,
@@ -23,4 +25,4 @@ export {
   type DeploymentFacets,
   type DeploymentManifest,
   type LocalDeployment,
-} from "./deployments";
+} from "./deployments.js";

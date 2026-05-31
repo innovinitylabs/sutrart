@@ -2,11 +2,11 @@
 pragma solidity ^0.8.28;
 
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
-import {ISutrartMarket} from "../interfaces/ISutrartMarket.sol";
-import {SutrartPayouts} from "./SutrartPayouts.sol";
-import {SutrartStorage} from "./SutrartStorage.sol";
+import {IPariMarket} from "../interfaces/IPariMarket.sol";
+import {PariPayouts} from "./PariPayouts.sol";
+import {PariStorage} from "./PariStorage.sol";
 
-library SutrartSettlement {
+library PariSettlement {
     function executeSale(
         address seller,
         address buyer,
@@ -15,10 +15,10 @@ library SutrartSettlement {
         uint256 price,
         address marketplaceFeeRecipient,
         uint96 marketplaceFeeBps
-    ) internal returns (ISutrartMarket.PayoutPreview memory payout) {
-        SutrartStorage.Layout storage ds = SutrartStorage.layout();
+    ) internal returns (IPariMarket.PayoutPreview memory payout) {
+        PariStorage.Layout storage ds = PariStorage.layout();
 
-        payout = SutrartPayouts.computePayoutPreview(nftContract, tokenId, price, marketplaceFeeBps);
+        payout = PariPayouts.computePayoutPreview(nftContract, tokenId, price, marketplaceFeeBps);
 
         if (payout.marketplaceFee > 0) {
             require(marketplaceFeeRecipient != address(0), "Marketplace fee recipient is zero");
@@ -37,7 +37,7 @@ library SutrartSettlement {
             require(sentMarketplaceFee, "Marketplace fee transfer failed");
         }
 
-        uint256 royaltyPaid = SutrartPayouts.royaltyPayoutAmount(payout.royaltyAmount, payout.royaltyRecipient);
+        uint256 royaltyPaid = PariPayouts.royaltyPayoutAmount(payout.royaltyAmount, payout.royaltyRecipient);
         if (royaltyPaid > 0) {
             (bool sentRoyalty,) = payable(payout.royaltyRecipient).call{value: royaltyPaid}("");
             require(sentRoyalty, "Royalty transfer failed");

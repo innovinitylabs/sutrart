@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getAddress, isAddress } from "viem";
-import { getCreatorStorefront } from "@sutrart/sdk";
-import { getDefaultChainId, SUTRART_PROTOCOL_VERSION } from "@sutrart/shared";
+import { getCreatorStorefront } from "@pari/sdk";
+import { getDefaultChainId, PARI_PROTOCOL_VERSION } from "@pari/shared";
 import { Nav } from "@/components/nav";
 import { CollectionGrid } from "@/components/storefront/collection-grid";
 import { CreatorStorefrontSyndication } from "@/components/creator-storefront-syndication";
@@ -61,7 +61,7 @@ export default async function CreatorStorefrontPage({ params }: PageProps) {
           <p className="text-sm text-muted-foreground">
             Sovereign inventory surface for collections, onchain listings, and signed liquidity.
           </p>
-          <p className="text-xs text-muted-foreground">Protocol {SUTRART_PROTOCOL_VERSION}</p>
+          <p className="text-xs text-muted-foreground">Protocol {PARI_PROTOCOL_VERSION}</p>
         </div>
 
         <section className="space-y-4">

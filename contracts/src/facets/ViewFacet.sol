@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {SutrartStorage} from "../libraries/SutrartStorage.sol";
+import {PariStorage} from "../libraries/PariStorage.sol";
 
 contract ViewFacet {
     function listings(uint256 listingId)
@@ -17,7 +17,7 @@ contract ViewFacet {
             uint256 createdAt
         )
     {
-        SutrartStorage.Listing storage listing = SutrartStorage.layout().listings[listingId];
+        PariStorage.Listing storage listing = PariStorage.layout().listings[listingId];
         return (
             listing.listingId,
             listing.seller,
@@ -30,22 +30,22 @@ contract ViewFacet {
     }
 
     function nextListingId() external view returns (uint256) {
-        return SutrartStorage.layout().nextListingId;
+        return PariStorage.layout().nextListingId;
     }
 
     function protocolFeeBps() external view returns (uint96) {
-        return SutrartStorage.layout().protocolFeeBps;
+        return PariStorage.layout().protocolFeeBps;
     }
 
     function protocolTreasury() external view returns (address) {
-        return SutrartStorage.layout().protocolTreasury;
+        return PariStorage.layout().protocolTreasury;
     }
 
     function MAX_PROTOCOL_FEE_BPS() external pure returns (uint96) {
-        return SutrartStorage.MAX_PROTOCOL_FEE_BPS;
+        return PariStorage.MAX_PROTOCOL_FEE_BPS;
     }
 
     function MAX_MARKETPLACE_FEE_BPS() external pure returns (uint96) {
-        return SutrartStorage.MAX_MARKETPLACE_FEE_BPS;
+        return PariStorage.MAX_MARKETPLACE_FEE_BPS;
     }
 }

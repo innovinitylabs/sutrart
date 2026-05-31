@@ -5,7 +5,7 @@ import {
   fetchSignedListingFeed,
   importSignedListingFeed,
   type SignedListingFeedV1,
-} from "@sutrart/sdk";
+} from "@pari/sdk";
 import { Button } from "@/components/ui/button";
 import { StatusMessage } from "@/components/status-message";
 import { formatPanelError } from "@/components/status-message";
@@ -129,7 +129,7 @@ export function FeedIngestionPanel({
       <div className="flex flex-wrap gap-2">
         <input
           className="min-w-[280px] flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
-          placeholder="https://creator.site/sutrart-feed.json"
+          placeholder="https://creator.site/pari-feed.json"
           value={nextUrl}
           onChange={(event) => setNextUrl(event.target.value)}
         />

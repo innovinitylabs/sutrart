@@ -15,10 +15,10 @@ import {SignedListingFacet} from "../src/facets/SignedListingFacet.sol";
 import {ViewFacet} from "../src/facets/ViewFacet.sol";
 import {ERC721RTFactoryFacet} from "../src/facets/ERC721RTFactoryFacet.sol";
 import {IERC721RTFactory} from "../src/interfaces/IERC721RTFactory.sol";
-import {ISutrartMarket} from "../src/interfaces/ISutrartMarket.sol";
-import {SutrartInit} from "../src/SutrartInit.sol";
+import {IPariMarket} from "../src/interfaces/IPariMarket.sol";
+import {PariInit} from "../src/PariInit.sol";
 
-abstract contract DeploySutrartBase is Script {
+abstract contract DeployPariBase is Script {
     string internal constant PROTOCOL_VERSION = "v0.1-alpha";
     struct DeploymentFacets {
         address diamondCutFacet;
@@ -37,7 +37,7 @@ abstract contract DeploySutrartBase is Script {
         DeploymentFacets facets;
     }
 
-    function deploySutrartDiamond(address owner) internal returns (DeploymentResult memory result) {
+    function deployPariDiamond(address owner) internal returns (DeploymentResult memory result) {
         DiamondCutFacet diamondCutFacet = new DiamondCutFacet();
         result.diamond = new Diamond(owner, address(diamondCutFacet));
         result.facets.diamondCutFacet = address(diamondCutFacet);
@@ -50,7 +50,7 @@ abstract contract DeploySutrartBase is Script {
         ProtocolConfigFacet protocolConfigFacet = new ProtocolConfigFacet();
         ViewFacet viewFacet = new ViewFacet();
         ERC721RTFactoryFacet erc721rtFactoryFacet = new ERC721RTFactoryFacet();
-        SutrartInit init = new SutrartInit();
+        PariInit init = new PariInit();
 
         result.facets.diamondLoupeFacet = address(diamondLoupeFacet);
         result.facets.ownershipFacet = address(ownershipFacet);
@@ -71,7 +71,7 @@ abstract contract DeploySutrartBase is Script {
         cut[6] = _facetCut(address(viewFacet), _viewSelectors());
         cut[7] = _facetCut(address(erc721rtFactoryFacet), _erc721rtFactorySelectors());
 
-        bytes memory initCalldata = abi.encodeWithSelector(SutrartInit.init.selector, owner);
+        bytes memory initCalldata = abi.encodeWithSelector(PariInit.init.selector, owner);
         IDiamondCut(address(result.diamond)).diamondCut(cut, address(init), initCalldata);
 
         assertDeploymentSanity(result);
@@ -80,19 +80,19 @@ abstract contract DeploySutrartBase is Script {
     function assertDeploymentSanity(DeploymentResult memory deployment) internal view {
         IDiamondLoupe loupe = IDiamondLoupe(address(deployment.diamond));
         address[] memory facetAddresses = loupe.facetAddresses();
-        require(facetAddresses.length >= 8, "DeploySutrartBase: expected at least 8 facets");
+        require(facetAddresses.length >= 8, "DeployPariBase: expected at least 8 facets");
 
-        require(deployment.facets.signedListingFacet != address(0), "DeploySutrartBase: signed listing facet missing");
-        require(deployment.facets.listingFacet != address(0), "DeploySutrartBase: listing facet missing");
-        require(deployment.facets.settlementFacet != address(0), "DeploySutrartBase: settlement facet missing");
-        require(deployment.facets.erc721rtFactoryFacet != address(0), "DeploySutrartBase: factory facet missing");
+        require(deployment.facets.signedListingFacet != address(0), "DeployPariBase: signed listing facet missing");
+        require(deployment.facets.listingFacet != address(0), "DeployPariBase: listing facet missing");
+        require(deployment.facets.settlementFacet != address(0), "DeployPariBase: settlement facet missing");
+        require(deployment.facets.erc721rtFactoryFacet != address(0), "DeployPariBase: factory facet missing");
 
-        bytes32 domainSeparator = ISutrartMarket(address(deployment.diamond)).domainSeparator();
-        require(domainSeparator != bytes32(0), "DeploySutrartBase: domain separator unset");
+        bytes32 domainSeparator = IPariMarket(address(deployment.diamond)).domainSeparator();
+        require(domainSeparator != bytes32(0), "DeployPariBase: domain separator unset");
     }
 
     function logDeploymentSummary(DeploymentResult memory deployment) internal view {
-        console2.log("Sutrart deployment sanity checks passed");
+        console2.log("PARI deployment sanity checks passed");
         console2.log("Protocol version:", PROTOCOL_VERSION);
         console2.log("Chain ID:", block.chainid);
         console2.log("Diamond:", address(deployment.diamond));
@@ -114,7 +114,7 @@ abstract contract DeploySutrartBase is Script {
         vm.serializeString(root, "protocolVersion", PROTOCOL_VERSION);
         vm.serializeString(root, "gitCommit", gitCommit);
         vm.serializeUint(root, "deployedAt", block.timestamp);
-        vm.serializeAddress(root, "SutrartMarket", address(deployment.diamond));
+        vm.serializeAddress(root, "PariMarket", address(deployment.diamond));
 
         if (mockNft != address(0)) {
             vm.serializeAddress(root, "MockERC721", mockNft);
@@ -134,7 +134,7 @@ abstract contract DeploySutrartBase is Script {
         );
 
         vm.serializeString(root, "facets", facetsJson);
-        string memory json = vm.serializeAddress(root, "SutrartMarket", address(deployment.diamond));
+        string memory json = vm.serializeAddress(root, "PariMarket", address(deployment.diamond));
 
         vm.writeJson(json, outputPath);
     }
@@ -163,43 +163,43 @@ abstract contract DeploySutrartBase is Script {
 
     function _listingSelectors() internal pure returns (bytes4[] memory selectors) {
         selectors = new bytes4[](3);
-        selectors[0] = ISutrartMarket.listNFT.selector;
-        selectors[1] = ISutrartMarket.cancelListing.selector;
-        selectors[2] = ISutrartMarket.isListingValid.selector;
+        selectors[0] = IPariMarket.listNFT.selector;
+        selectors[1] = IPariMarket.cancelListing.selector;
+        selectors[2] = IPariMarket.isListingValid.selector;
     }
 
     function _settlementSelectors() internal pure returns (bytes4[] memory selectors) {
         selectors = new bytes4[](2);
-        selectors[0] = ISutrartMarket.buyListing.selector;
-        selectors[1] = ISutrartMarket.previewPayouts.selector;
+        selectors[0] = IPariMarket.buyListing.selector;
+        selectors[1] = IPariMarket.previewPayouts.selector;
     }
 
     function _signedListingSelectors() internal pure returns (bytes4[] memory selectors) {
         selectors = new bytes4[](8);
-        selectors[0] = ISutrartMarket.buySignedListing.selector;
-        selectors[1] = ISutrartMarket.previewSignedPayouts.selector;
-        selectors[2] = ISutrartMarket.incrementSignedListingNonce.selector;
-        selectors[3] = ISutrartMarket.signedListingMinNonce.selector;
-        selectors[4] = ISutrartMarket.filledSignedListings.selector;
-        selectors[5] = ISutrartMarket.isSignedListingValid.selector;
-        selectors[6] = ISutrartMarket.domainSeparator.selector;
-        selectors[7] = ISutrartMarket.hashSignedListing.selector;
+        selectors[0] = IPariMarket.buySignedListing.selector;
+        selectors[1] = IPariMarket.previewSignedPayouts.selector;
+        selectors[2] = IPariMarket.incrementSignedListingNonce.selector;
+        selectors[3] = IPariMarket.signedListingMinNonce.selector;
+        selectors[4] = IPariMarket.filledSignedListings.selector;
+        selectors[5] = IPariMarket.isSignedListingValid.selector;
+        selectors[6] = IPariMarket.domainSeparator.selector;
+        selectors[7] = IPariMarket.hashSignedListing.selector;
     }
 
     function _protocolConfigSelectors() internal pure returns (bytes4[] memory selectors) {
         selectors = new bytes4[](2);
-        selectors[0] = ISutrartMarket.updateProtocolFee.selector;
-        selectors[1] = ISutrartMarket.updateProtocolTreasury.selector;
+        selectors[0] = IPariMarket.updateProtocolFee.selector;
+        selectors[1] = IPariMarket.updateProtocolTreasury.selector;
     }
 
     function _viewSelectors() internal pure returns (bytes4[] memory selectors) {
         selectors = new bytes4[](6);
-        selectors[0] = ISutrartMarket.listings.selector;
-        selectors[1] = ISutrartMarket.nextListingId.selector;
-        selectors[2] = ISutrartMarket.protocolFeeBps.selector;
-        selectors[3] = ISutrartMarket.protocolTreasury.selector;
-        selectors[4] = ISutrartMarket.MAX_PROTOCOL_FEE_BPS.selector;
-        selectors[5] = ISutrartMarket.MAX_MARKETPLACE_FEE_BPS.selector;
+        selectors[0] = IPariMarket.listings.selector;
+        selectors[1] = IPariMarket.nextListingId.selector;
+        selectors[2] = IPariMarket.protocolFeeBps.selector;
+        selectors[3] = IPariMarket.protocolTreasury.selector;
+        selectors[4] = IPariMarket.MAX_PROTOCOL_FEE_BPS.selector;
+        selectors[5] = IPariMarket.MAX_MARKETPLACE_FEE_BPS.selector;
     }
 
     function _erc721rtFactorySelectors() internal pure returns (bytes4[] memory selectors) {

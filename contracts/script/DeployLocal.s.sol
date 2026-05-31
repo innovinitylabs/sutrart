@@ -2,14 +2,14 @@
 pragma solidity ^0.8.28;
 
 import {MockERC721} from "../src/MockERC721.sol";
-import {DeploySutrartBase} from "./DeploySutrartBase.sol";
+import {DeployPariBase} from "./DeployPariBase.sol";
 
-contract DeployLocal is DeploySutrartBase {
+contract DeployLocal is DeployPariBase {
     function run() external {
         vm.startBroadcast();
 
         MockERC721 nft = new MockERC721();
-        DeploymentResult memory deployment = deploySutrartDiamond(msg.sender);
+        DeploymentResult memory deployment = deployPariDiamond(msg.sender);
 
         vm.stopBroadcast();
 

@@ -11,7 +11,7 @@ import {
   getCreatorInventory,
   type CreatorInventory,
   type InventoryToken,
-} from "@sutrart/sdk";
+} from "@pari/sdk";
 import { CreatorSignedListingsPanel } from "@/components/creator-signed-listings-panel";
 import { ChainStatus } from "@/components/chain-status";
 import { StatusMessage } from "@/components/status-message";
@@ -166,7 +166,7 @@ export function CreatorPanel() {
 
     writeContract({
       address: marketAddress,
-      abi: abis.SutrartMarket,
+      abi: abis.PariMarket,
       functionName: "listNFT",
       args: [token.collection, token.tokenId, parseEther(price)],
     });
@@ -180,7 +180,7 @@ export function CreatorPanel() {
 
     writeContract({
       address: marketAddress,
-      abi: abis.SutrartMarket,
+      abi: abis.PariMarket,
       functionName: "cancelListing",
       args: [token.listingState.listingId],
     });
@@ -216,7 +216,7 @@ export function CreatorPanel() {
         <div>
           <h2 className="text-lg font-medium">Create ERC721RT collection</h2>
           <p className="text-muted-foreground text-sm">
-            Deploy a creator-owned collection through the Sutrart factory facet.
+            Deploy a creator-owned collection through the PARI factory facet.
           </p>
         </div>
 

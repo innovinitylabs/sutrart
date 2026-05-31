@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAddress, isAddress, zeroAddress } from "viem";
-import { buildCreatorStorefrontPath, getCollectionStorefront } from "@sutrart/sdk";
+import { buildCreatorStorefrontPath, getCollectionStorefront } from "@pari/sdk";
 import { Nav } from "@/components/nav";
 import { StorefrontInventorySection } from "@/components/storefront/inventory-section";
 import { getServerMarketAddress, getServerPublicClient } from "@/lib/chain";
@@ -47,7 +47,7 @@ export default async function CollectionStorefrontPage({ params }: PageProps) {
       signedFeeds,
     });
   } catch (error) {
-    console.warn("[sutrart] Collection storefront rendering failed.", {
+    console.warn("[pari] Collection storefront rendering failed.", {
       collection,
       error: error instanceof Error ? error.message : String(error),
     });

@@ -1,4 +1,4 @@
-import { abis } from "@sutrart/abi";
+import { abis } from "@pari/abi";
 import type { Address, PublicClient } from "viem";
 
 export type Listing = {
@@ -27,7 +27,7 @@ export async function getListing(
 ): Promise<Listing> {
   const result = await publicClient.readContract({
     address: marketAddress,
-    abi: abis.SutrartMarket,
+    abi: abis.PariMarket,
     functionName: "listings",
     args: [listingId],
   });
@@ -50,7 +50,7 @@ export async function isListingValid(
 ): Promise<boolean> {
   return publicClient.readContract({
     address: marketAddress,
-    abi: abis.SutrartMarket,
+    abi: abis.PariMarket,
     functionName: "isListingValid",
     args: [listingId],
   });
@@ -62,7 +62,7 @@ export async function getNextListingId(
 ): Promise<bigint> {
   return publicClient.readContract({
     address: marketAddress,
-    abi: abis.SutrartMarket,
+    abi: abis.PariMarket,
     functionName: "nextListingId",
   });
 }
@@ -117,22 +117,22 @@ export async function getProtocolFeeConfig(
     await Promise.all([
       publicClient.readContract({
         address: marketAddress,
-        abi: abis.SutrartMarket,
+        abi: abis.PariMarket,
         functionName: "protocolFeeBps",
       }),
       publicClient.readContract({
         address: marketAddress,
-        abi: abis.SutrartMarket,
+        abi: abis.PariMarket,
         functionName: "protocolTreasury",
       }),
       publicClient.readContract({
         address: marketAddress,
-        abi: abis.SutrartMarket,
+        abi: abis.PariMarket,
         functionName: "MAX_PROTOCOL_FEE_BPS",
       }),
       publicClient.readContract({
         address: marketAddress,
-        abi: abis.SutrartMarket,
+        abi: abis.PariMarket,
         functionName: "MAX_MARKETPLACE_FEE_BPS",
       }),
     ]);
@@ -153,7 +153,7 @@ export async function previewPayouts(
 ): Promise<PayoutPreview> {
   const result = await publicClient.readContract({
     address: marketAddress,
-    abi: abis.SutrartMarket,
+    abi: abis.PariMarket,
     functionName: "previewPayouts",
     args: [listingId, marketplaceFeeBps],
   });

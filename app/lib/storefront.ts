@@ -2,7 +2,7 @@ import {
   fetchSignedListingFeed,
   mergeSignedFeeds,
   type SignedListingFeedV1,
-} from "@sutrart/sdk";
+} from "@pari/sdk";
 import type { Address } from "viem";
 import {
   loadAllLocalFeeds,
@@ -34,7 +34,7 @@ export async function loadSyndicatedSignedFeeds(options?: {
       feeds.push(await fetchSignedListingFeed(remoteFeedUrl));
     } catch (error) {
       // Ignore unreachable configured feed URLs during server assembly.
-      console.warn("[sutrart] Remote signed listing feed fetch failed.", {
+      console.warn("[pari] Remote signed listing feed fetch failed.", {
         url: remoteFeedUrl,
         chainId: options?.chainId,
         error: error instanceof Error ? error.message : String(error),
@@ -49,7 +49,7 @@ export async function loadSyndicatedSignedFeeds(options?: {
         feeds.push(await fetchSignedListingFeed(url));
       } catch (error) {
         // Ignore unreachable marketplace feed URLs.
-        console.warn("[sutrart] Marketplace feed fetch failed.", {
+        console.warn("[pari] Marketplace feed fetch failed.", {
           url,
           chainId: options?.chainId,
           error: error instanceof Error ? error.message : String(error),

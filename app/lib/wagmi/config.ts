@@ -1,5 +1,5 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
-import { APP_NAME, getWalletConnectProjectId, supportedChains } from "@sutrart/shared";
+import { APP_NAME, getWalletConnectProjectId, supportedChains } from "@pari/shared";
 import type { Config } from "wagmi";
 
 const projectId = getWalletConnectProjectId() || "00000000000000000000000000000000";

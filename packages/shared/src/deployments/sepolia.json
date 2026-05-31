@@ -1,19 +1,19 @@
 {
-  "SutrartMarket": "0x03fD2aac3bC00320C40A90C85Fc817A4756BaaEE",
+  "PariMarket": "0xa01451d6dc3340A1e75aB3221007F46e64EFAB31",
   "chainId": 11155111,
   "chainName": "sepolia",
-  "deployedAt": 1779822984,
+  "deployedAt": 1780234464,
   "facets": {
-    "DiamondCutFacet": "0x56D2D48A7FD0Ce48Ef834940A7892724c2Ee4AEF",
-    "DiamondLoupeFacet": "0x7700bd753E0b6d92642b0c6Fa1E0d53B504e2ccC",
-    "ERC721RTFactoryFacet": "0x4D51F452a0972c6e16222688b60E007f61DEC23b",
-    "ListingFacet": "0xb845cDB14baa55BD0142a8123763D4b60c2844eE",
-    "OwnershipFacet": "0x08573FE10F76ed3111762E15743f57E178c8778f",
-    "ProtocolConfigFacet": "0x9B3D45d6e9f5A38A746Abc51E739605fFed92463",
-    "SettlementFacet": "0x4F644dB90E3cB0a6D879587ce6383c23220AFFE9",
-    "SignedListingFacet": "0x4163418242b7C02baB40E728772a3ba5CfdCebA6",
-    "ViewFacet": "0x77c0F87621B7509eD76Bb78ce39eEaD9E98E6670"
+    "DiamondCutFacet": "0x9f6482F4Ca2F62E157E230b25B231F090647b9F6",
+    "DiamondLoupeFacet": "0x7F8a71be0f4959e72030b1f9CD13aa4e0F15AF94",
+    "ERC721RTFactoryFacet": "0x2263cf7764c19070b6fCE6E8B707f2bDc35222C9",
+    "ListingFacet": "0x2B3C693C75c2730BDF1Ad3Efac225d98Ac61cBA4",
+    "OwnershipFacet": "0xa8A208be31DFF9E3947f67ceD925423bCE4860E2",
+    "ProtocolConfigFacet": "0xD0cb4C0AabB684948b0d695960971bfC50c8291E",
+    "SettlementFacet": "0xF6e1b64572850F2009C2De21C09433C379cd661B",
+    "SignedListingFacet": "0xE3B172ba6429d10510a532567717eAF777bc40E4",
+    "ViewFacet": "0x9c71E84b3187fedBD6F6d5d8eecc85f88F319f5f"
   },
-  "gitCommit": "39977f2b02ed92318e8db2c8927d435a2b1af484",
+  "gitCommit": "a3466cc8f559ddff41a12b680bbe5eb1d6d0e922",
   "protocolVersion": "v0.1-alpha"
 }

@@ -3,20 +3,20 @@ pragma solidity ^0.8.28;
 
 import {IERC2981} from "openzeppelin-contracts/contracts/interfaces/IERC2981.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
-import {ISutrartMarket} from "../interfaces/ISutrartMarket.sol";
-import {SutrartStorage} from "./SutrartStorage.sol";
+import {IPariMarket} from "../interfaces/IPariMarket.sol";
+import {PariStorage} from "./PariStorage.sol";
 
-library SutrartPayouts {
+library PariPayouts {
     function computePayoutPreview(address nftContract, uint256 tokenId, uint256 grossPrice, uint96 marketplaceFeeBps)
         internal
         view
-        returns (ISutrartMarket.PayoutPreview memory preview)
+        returns (IPariMarket.PayoutPreview memory preview)
     {
-        SutrartStorage.Layout storage ds = SutrartStorage.layout();
+        PariStorage.Layout storage ds = PariStorage.layout();
 
         preview.grossPrice = grossPrice;
         preview.protocolFee = (grossPrice * uint256(ds.protocolFeeBps)) / 10_000;
-        require(marketplaceFeeBps <= SutrartStorage.MAX_MARKETPLACE_FEE_BPS, "Marketplace fee too high");
+        require(marketplaceFeeBps <= PariStorage.MAX_MARKETPLACE_FEE_BPS, "Marketplace fee too high");
         preview.marketplaceFee = (grossPrice * uint256(marketplaceFeeBps)) / 10_000;
 
         uint256 remainingAfterFees = grossPrice - preview.protocolFee - preview.marketplaceFee;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeCollectionMetadataDocument } from "./metadata";
+import { normalizeCollectionMetadataDocument } from "./metadata.js";
 
 describe("normalizeCollectionMetadataDocument", () => {
   it("returns null for invalid input", () => {

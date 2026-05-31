@@ -1,8 +1,8 @@
-# Sutrart architecture
+# PARI architecture
 
 ## Overview
 
-Sutrart is developed as a single monorepo containing the protocol (Solidity) and a reference frontend (Next.js). This keeps iteration fast: contract changes, ABI updates, SDK helpers, and UI can evolve together without coordinating multiple repositories.
+PARI is developed as a single monorepo containing the protocol (Solidity) and a reference frontend (Next.js). This keeps iteration fast: contract changes, ABI updates, SDK helpers, and UI can evolve together without coordinating multiple repositories.
 
 ## Boundaries
 
@@ -27,7 +27,7 @@ Sutrart is developed as a single monorepo containing the protocol (Solidity) and
 ### `packages/sdk`
 
 - Protocol-facing TypeScript API (read/write helpers added incrementally)
-- Depends on `@sutrart/shared` and `@sutrart/abi`
+- Depends on `@pari/shared` and `@pari/abi`
 - Re-exported constants for convenience
 
 ### `app/` (Next.js)
@@ -49,7 +49,7 @@ Sutrart is developed as a single monorepo containing the protocol (Solidity) and
 
 1. `pnpm install` — link workspace packages
 2. `pnpm contracts:build` — compile contracts
-3. `pnpm --filter @sutrart/shared build` (or `pnpm build` at root) — emit package `dist/`
+3. `pnpm --filter @pari/shared build` (or `pnpm build` at root) — emit package `dist/`
 4. `pnpm dev` — run Next.js with Turbopack
 
 ## Design decisions

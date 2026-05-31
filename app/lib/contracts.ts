@@ -1,15 +1,17 @@
 "use client";
 
-import { getContractAddress, isSupportedDeploymentChain } from "@sutrart/shared";
-import { useChainId } from "wagmi";
+import { getContractAddress, getDefaultChainId, isSupportedDeploymentChain } from "@pari/shared";
+import { useAccount, useChainId } from "wagmi";
 
 export function useContractAddresses() {
-  const chainId = useChainId();
+  const { isConnected } = useAccount();
+  const walletChainId = useChainId();
+  const chainId = isConnected ? walletChainId : getDefaultChainId();
 
   return {
     chainId,
     isSupportedChain: isSupportedDeploymentChain(chainId),
     nftAddress: getContractAddress(chainId, "MockERC721"),
-    marketAddress: getContractAddress(chainId, "SutrartMarket"),
+    marketAddress: getContractAddress(chainId, "PariMarket"),
   };
 }

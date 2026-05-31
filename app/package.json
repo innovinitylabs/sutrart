@@ -1,5 +1,5 @@
 {
-  "name": "@sutrart/app",
+  "name": "@pari/app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.2.8",
-    "@sutrart/sdk": "workspace:*",
-    "@sutrart/shared": "workspace:*",
+    "@pari/sdk": "workspace:*",
+    "@pari/shared": "workspace:*",
     "@tanstack/react-query": "^5.80.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

@@ -15,13 +15,13 @@ import {SignedListingFacet} from "../../src/facets/SignedListingFacet.sol";
 import {ERC721RTFactoryFacet} from "../../src/facets/ERC721RTFactoryFacet.sol";
 import {ViewFacet} from "../../src/facets/ViewFacet.sol";
 import {IERC721RTFactory} from "../../src/interfaces/IERC721RTFactory.sol";
-import {ISutrartMarket} from "../../src/interfaces/ISutrartMarket.sol";
-import {SutrartInit} from "../../src/SutrartInit.sol";
+import {IPariMarket} from "../../src/interfaces/IPariMarket.sol";
+import {PariInit} from "../../src/PariInit.sol";
 
 abstract contract DiamondTestHelper is Test {
-    struct SutrartDiamondDeployment {
+    struct PariDiamondDeployment {
         Diamond diamond;
-        ISutrartMarket market;
+        IPariMarket market;
         IDiamondLoupe loupe;
         address diamondCutFacet;
         address diamondLoupeFacet;
@@ -34,7 +34,7 @@ abstract contract DiamondTestHelper is Test {
         address erc721rtFactoryFacet;
     }
 
-    function _deploySutrartDiamond(address owner) internal returns (SutrartDiamondDeployment memory deployment) {
+    function _deployPariDiamond(address owner) internal returns (PariDiamondDeployment memory deployment) {
         DiamondCutFacet diamondCutFacet = new DiamondCutFacet();
         deployment.diamond = new Diamond(owner, address(diamondCutFacet));
         deployment.diamondCutFacet = address(diamondCutFacet);
@@ -47,7 +47,7 @@ abstract contract DiamondTestHelper is Test {
         ProtocolConfigFacet protocolConfigFacet = new ProtocolConfigFacet();
         ViewFacet viewFacet = new ViewFacet();
         ERC721RTFactoryFacet erc721rtFactoryFacet = new ERC721RTFactoryFacet();
-        SutrartInit init = new SutrartInit();
+        PariInit init = new PariInit();
 
         deployment.diamondLoupeFacet = address(diamondLoupeFacet);
         deployment.ownershipFacet = address(ownershipFacet);
@@ -68,10 +68,10 @@ abstract contract DiamondTestHelper is Test {
         cut[6] = _facetCut(address(viewFacet), _viewSelectors());
         cut[7] = _facetCut(address(erc721rtFactoryFacet), _erc721rtFactorySelectors());
 
-        bytes memory initCalldata = abi.encodeWithSelector(SutrartInit.init.selector, owner);
+        bytes memory initCalldata = abi.encodeWithSelector(PariInit.init.selector, owner);
         IDiamondCut(address(deployment.diamond)).diamondCut(cut, address(init), initCalldata);
 
-        deployment.market = ISutrartMarket(address(deployment.diamond));
+        deployment.market = IPariMarket(address(deployment.diamond));
         deployment.loupe = IDiamondLoupe(address(deployment.diamond));
     }
 
@@ -99,43 +99,43 @@ abstract contract DiamondTestHelper is Test {
 
     function _listingSelectors() internal pure returns (bytes4[] memory selectors) {
         selectors = new bytes4[](3);
-        selectors[0] = ISutrartMarket.listNFT.selector;
-        selectors[1] = ISutrartMarket.cancelListing.selector;
-        selectors[2] = ISutrartMarket.isListingValid.selector;
+        selectors[0] = IPariMarket.listNFT.selector;
+        selectors[1] = IPariMarket.cancelListing.selector;
+        selectors[2] = IPariMarket.isListingValid.selector;
     }
 
     function _settlementSelectors() internal pure returns (bytes4[] memory selectors) {
         selectors = new bytes4[](2);
-        selectors[0] = ISutrartMarket.buyListing.selector;
-        selectors[1] = ISutrartMarket.previewPayouts.selector;
+        selectors[0] = IPariMarket.buyListing.selector;
+        selectors[1] = IPariMarket.previewPayouts.selector;
     }
 
     function _signedListingSelectors() internal pure returns (bytes4[] memory selectors) {
         selectors = new bytes4[](8);
-        selectors[0] = ISutrartMarket.buySignedListing.selector;
-        selectors[1] = ISutrartMarket.previewSignedPayouts.selector;
-        selectors[2] = ISutrartMarket.incrementSignedListingNonce.selector;
-        selectors[3] = ISutrartMarket.signedListingMinNonce.selector;
-        selectors[4] = ISutrartMarket.filledSignedListings.selector;
-        selectors[5] = ISutrartMarket.isSignedListingValid.selector;
-        selectors[6] = ISutrartMarket.domainSeparator.selector;
-        selectors[7] = ISutrartMarket.hashSignedListing.selector;
+        selectors[0] = IPariMarket.buySignedListing.selector;
+        selectors[1] = IPariMarket.previewSignedPayouts.selector;
+        selectors[2] = IPariMarket.incrementSignedListingNonce.selector;
+        selectors[3] = IPariMarket.signedListingMinNonce.selector;
+        selectors[4] = IPariMarket.filledSignedListings.selector;
+        selectors[5] = IPariMarket.isSignedListingValid.selector;
+        selectors[6] = IPariMarket.domainSeparator.selector;
+        selectors[7] = IPariMarket.hashSignedListing.selector;
     }
 
     function _protocolConfigSelectors() internal pure returns (bytes4[] memory selectors) {
         selectors = new bytes4[](2);
-        selectors[0] = ISutrartMarket.updateProtocolFee.selector;
-        selectors[1] = ISutrartMarket.updateProtocolTreasury.selector;
+        selectors[0] = IPariMarket.updateProtocolFee.selector;
+        selectors[1] = IPariMarket.updateProtocolTreasury.selector;
     }
 
     function _viewSelectors() internal pure returns (bytes4[] memory selectors) {
         selectors = new bytes4[](6);
-        selectors[0] = ISutrartMarket.listings.selector;
-        selectors[1] = ISutrartMarket.nextListingId.selector;
-        selectors[2] = ISutrartMarket.protocolFeeBps.selector;
-        selectors[3] = ISutrartMarket.protocolTreasury.selector;
-        selectors[4] = ISutrartMarket.MAX_PROTOCOL_FEE_BPS.selector;
-        selectors[5] = ISutrartMarket.MAX_MARKETPLACE_FEE_BPS.selector;
+        selectors[0] = IPariMarket.listings.selector;
+        selectors[1] = IPariMarket.nextListingId.selector;
+        selectors[2] = IPariMarket.protocolFeeBps.selector;
+        selectors[3] = IPariMarket.protocolTreasury.selector;
+        selectors[4] = IPariMarket.MAX_PROTOCOL_FEE_BPS.selector;
+        selectors[5] = IPariMarket.MAX_MARKETPLACE_FEE_BPS.selector;
     }
 
     function _erc721rtFactorySelectors() internal pure returns (bytes4[] memory selectors) {

@@ -5,7 +5,7 @@ import {MessageHashUtils} from "openzeppelin-contracts/contracts/utils/cryptogra
 
 /// @dev Diamond-safe EIP-712 helpers. Uses `address(this)` at runtime so the domain
 ///      separator always references the Diamond proxy, not a facet implementation.
-library LibSutrartEIP712 {
+library LibPariEIP712 {
     bytes32 internal constant EIP712_DOMAIN_TYPEHASH =
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
@@ -13,7 +13,7 @@ library LibSutrartEIP712 {
         "SignedListing(address seller,address nftContract,uint256 tokenId,uint256 price,uint256 expiry,uint256 nonce)"
     );
 
-    bytes32 internal constant HASHED_NAME = keccak256(bytes("Sutrart"));
+    bytes32 internal constant HASHED_NAME = keccak256(bytes("PARI"));
     bytes32 internal constant HASHED_VERSION = keccak256(bytes("1"));
 
     function domainSeparator() internal view returns (bytes32) {

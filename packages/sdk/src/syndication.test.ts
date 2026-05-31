@@ -8,7 +8,7 @@ import {
   pruneStaleSignedListingFeed,
   validateSignedFeed,
   type SignedListingFeedV1,
-} from "./syndication";
+} from "./syndication.js";
 
 const market = zeroAddress;
 const creator = getAddress("0x0000000000000000000000000000000000000001");

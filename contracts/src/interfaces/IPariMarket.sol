@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-interface ISutrartMarket {
+interface IPariMarket {
     struct Listing {
         uint256 listingId;
         address seller;

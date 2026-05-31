@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {DeploySutrartBase} from "./DeploySutrartBase.sol";
+import {DeployPariBase} from "./DeployPariBase.sol";
 
-contract DeploySepolia is DeploySutrartBase {
+contract DeploySepolia is DeployPariBase {
     function run() external {
         vm.startBroadcast();
 
-        DeploymentResult memory deployment = deploySutrartDiamond(msg.sender);
+        DeploymentResult memory deployment = deployPariDiamond(msg.sender);
 
         vm.stopBroadcast();
 

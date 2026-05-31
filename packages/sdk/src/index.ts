@@ -1,5 +1,5 @@
-export { abis, erc721rtAbi, erc721rtFactoryAbi, mockErc721Abi, sutrartMarketAbi } from "@sutrart/abi";
-export { APP_NAME, defaultChain, getContractAddress, supportedChains } from "@sutrart/shared";
+export { abis, erc721rtAbi, erc721rtFactoryAbi, mockErc721Abi, pariMarketAbi } from "@pari/abi";
+export { APP_NAME, defaultChain, getContractAddress, supportedChains } from "@pari/shared";
 
 export const SDK_VERSION = "0.0.0";
 
@@ -14,8 +14,8 @@ export {
   type Listing,
   type PayoutPreview,
   type ProtocolFeeConfig,
-} from "./market";
-export { getNextTokenId, getOwnedTokenIds, isApprovedForMarket } from "./nft";
+} from "./market.js";
+export { getNextTokenId, getOwnedTokenIds, isApprovedForMarket } from "./nft.js";
 export {
   buildCreateCollectionArgs,
   createCollection,
@@ -27,7 +27,7 @@ export {
   mintCollectionToken,
   type CollectionWriteClients,
   type CreateCollectionParams,
-} from "./collection";
+} from "./collection.js";
 export {
   buildActiveListingIndex,
   getCollectionTokens,
@@ -39,7 +39,7 @@ export {
   type InventoryCollection,
   type InventoryToken,
   type TokenListingState,
-} from "./inventory";
+} from "./inventory.js";
 export {
   discoverOnchainMarketListings,
   discoverSignedMarketListings,
@@ -66,7 +66,7 @@ export {
   type SignedListingFeed,
   type SignedListingOrder,
   type SignedMarketListing,
-} from "./discovery";
+} from "./discovery.js";
 export {
   fetchCollectionMetadataDocument,
   getCollectionChainMetadata,
@@ -75,7 +75,7 @@ export {
   normalizeCollectionMetadataDocument,
   type CollectionMetadataDocument,
   type NormalizedCollectionMetadata,
-} from "./metadata";
+} from "./metadata.js";
 export {
   buildCollectionStorefrontPath,
   buildCreatorStorefrontPath,
@@ -99,7 +99,7 @@ export {
   type ListingProvenance,
   type StorefrontParams,
   type StorefrontToken,
-} from "./storefront";
+} from "./storefront.js";
 export {
   getDomainSeparator,
   getSignedListingMinNonce,
@@ -108,9 +108,9 @@ export {
   previewSignedPayouts,
   signSignedListing,
   SIGNED_LISTING_EIP712_TYPES,
-  SUTRART_EIP712_DOMAIN,
+  PARI_EIP712_DOMAIN,
   type SignedListing,
-} from "./signedListing";
+} from "./signedListing.js";
 export {
   buildRevokeSignedListingsTransaction,
   buildSignedListingDraft,
@@ -128,7 +128,7 @@ export {
   removeSignedListingFromFeedByLookupKey,
   revokeSignedListings,
   SIGNED_LISTING_FEED_VERSION,
-  SUTRART_PROTOCOL_VERSION,
+  PARI_PROTOCOL_VERSION,
   validateSignedFeed,
   type CreateSignedListingFeedParams,
   type CreatorSignedListingEntry,
@@ -137,4 +137,4 @@ export {
   type SignedFeedValidationResult,
   type SignedListingFeedMetadata,
   type SignedListingFeedV1,
-} from "./syndication";
+} from "./syndication.js";

@@ -1,0 +1,190 @@
+{
+  "validatedAt": "2026-05-31T13:45:27.623Z",
+  "manifest": {
+    "PariMarket": "0xa01451d6dc3340A1e75aB3221007F46e64EFAB31",
+    "chainId": 11155111,
+    "chainName": "sepolia",
+    "deployedAt": 1780234464,
+    "facets": {
+      "DiamondCutFacet": "0x9f6482F4Ca2F62E157E230b25B231F090647b9F6",
+      "DiamondLoupeFacet": "0x7F8a71be0f4959e72030b1f9CD13aa4e0F15AF94",
+      "ERC721RTFactoryFacet": "0x2263cf7764c19070b6fCE6E8B707f2bDc35222C9",
+      "ListingFacet": "0x2B3C693C75c2730BDF1Ad3Efac225d98Ac61cBA4",
+      "OwnershipFacet": "0xa8A208be31DFF9E3947f67ceD925423bCE4860E2",
+      "ProtocolConfigFacet": "0xD0cb4C0AabB684948b0d695960971bfC50c8291E",
+      "SettlementFacet": "0xF6e1b64572850F2009C2De21C09433C379cd661B",
+      "SignedListingFacet": "0xE3B172ba6429d10510a532567717eAF777bc40E4",
+      "ViewFacet": "0x9c71E84b3187fedBD6F6d5d8eecc85f88F319f5f"
+    },
+    "gitCommit": "a3466cc8f559ddff41a12b680bbe5eb1d6d0e922",
+    "protocolVersion": "v0.1-alpha"
+  },
+  "wallets": {
+    "creator": "0x7Bc9427C8730b87Ab3faD10DA63F0C4b9e9E0A5F",
+    "collector": "0x4beA5744416D27E721Df679343C39380b53C1297",
+    "protocolTreasury": "0x7Bc9427C8730b87Ab3faD10DA63F0C4b9e9E0A5F"
+  },
+  "collection": "0xa05344Dc0957d38725A77f7d274d8562071113Cd",
+  "tokenIds": [
+    "1",
+    "2",
+    "3"
+  ],
+  "feedUrl": "/validation/sepolia-feed-v1.json",
+  "steps": [
+    {
+      "step": "setup",
+      "marketAddress": "0xa01451d6dc3340A1e75aB3221007F46e64EFAB31",
+      "chainId": 11155111,
+      "creator": "0x7Bc9427C8730b87Ab3faD10DA63F0C4b9e9E0A5F",
+      "collector": "0x4beA5744416D27E721Df679343C39380b53C1297",
+      "protocolVersion": "v0.1-alpha"
+    },
+    {
+      "step": "fund_collector",
+      "txHash": "0x83f4322f8743c4bd22a2b9011119a9d7d55c5af8954175dd41031fbb2db54066",
+      "amountEth": "0.05"
+    },
+    {
+      "step": "protocol_fee_config",
+      "protocolFeeBps": "50",
+      "protocolTreasury": "0x7Bc9427C8730b87Ab3faD10DA63F0C4b9e9E0A5F"
+    },
+    {
+      "step": "deploy_collection",
+      "txHash": "0x7a34c4ddfcb40f7be8d0e6d1e6f120b85203b1fbf01fb8de2899e8f3c2e15e5e",
+      "collectionAddress": "0xa05344Dc0957d38725A77f7d274d8562071113Cd",
+      "blockNumber": "10961465",
+      "royaltyBps": "500",
+      "royaltyRecipient": "0x7Bc9427C8730b87Ab3faD10DA63F0C4b9e9E0A5F"
+    },
+    {
+      "step": "mint_token_1",
+      "txHash": "0x0c7e55e20a6a83e032f12d290d333b41e5736e9039df62091b45f693a6de54c6",
+      "tokenId": "1"
+    },
+    {
+      "step": "mint_token_2",
+      "txHash": "0x8929053cfd41e0485046f075b3f90e34e8aa7add214f9aab14f5d842757110e7",
+      "tokenId": "2"
+    },
+    {
+      "step": "mint_token_3",
+      "txHash": "0x1f56132aefccc6b680d232baba8d0c2f5d9dd89a0eafce71afcdc95fd4f01403",
+      "tokenId": "3"
+    },
+    {
+      "step": "approve_market_token_1",
+      "txHash": "0x4f03ef89696081dcb4fb75622acc048d0bbd5ab91b0d5189f8aafc6e2ad40e29"
+    },
+    {
+      "step": "approve_market_token_2",
+      "txHash": "0x1ed15618e9d35ed184660b2401da090bfc661abf6f23a923e74c2d2bde1fb523"
+    },
+    {
+      "step": "approve_market_token_3",
+      "txHash": "0x31cd7affd7a16e78ea284f37f6cbabbef6984ce3f8e0b93f0ab3ffd85b17ed6c"
+    },
+    {
+      "step": "create_onchain_listing",
+      "txHash": "0x8a900bcc1c04900d5e1b469799b35d1a8a2cd55fe14eba879f909617348562fe",
+      "listingId": "1",
+      "tokenId": "1",
+      "priceEth": "0.01",
+      "payoutPreview": {
+        "grossPrice": "10000000000000000",
+        "protocolFee": "50000000000000",
+        "marketplaceFee": "100000000000000",
+        "royaltyAmount": "500000000000000",
+        "royaltyRecipient": "0x7Bc9427C8730b87Ab3faD10DA63F0C4b9e9E0A5F",
+        "sellerProceeds": "9350000000000000"
+      }
+    },
+    {
+      "step": "create_signed_listings",
+      "token2": {
+        "tokenId": "2",
+        "nonce": "0",
+        "signature": "0x3997f45b6b933978f1e53cbfc6662367c141db809dad651eed0a75da257f659852d56fbc177d8ef8f9393d5cc1f7d1359c961368d4af3e4728175f7e06e552be1c"
+      },
+      "token3": {
+        "tokenId": "3",
+        "nonce": "0",
+        "signature": "0xf17a5bd493dbf529e58bb85004550ece15867791ab973a4493f738a7ba1f9bf2303d198c206390a5309b4c7cce8446158c2fdc74071c587413fa11a612d63c711c"
+      },
+      "feedValidation": true,
+      "feedPath": "app/public/validation/sepolia-feed-v1.json",
+      "payoutPreview": {
+        "grossPrice": "10000000000000000",
+        "protocolFee": "50000000000000",
+        "marketplaceFee": "100000000000000",
+        "royaltyAmount": "500000000000000",
+        "royaltyRecipient": "0x7Bc9427C8730b87Ab3faD10DA63F0C4b9e9E0A5F",
+        "sellerProceeds": "9350000000000000"
+      }
+    },
+    {
+      "step": "discovery_before_purchase",
+      "totalListings": 3,
+      "validListings": 3,
+      "onchain": 1,
+      "signed": 2
+    },
+    {
+      "step": "collector_buy_onchain",
+      "txHash": "0xd0acd3361e1a6198b753d3d7466e49f2bdb6297958d8c1879ca304fe4eb2c0a9",
+      "listingId": "1",
+      "newOwner": "0x4beA5744416D27E721Df679343C39380b53C1297",
+      "listingStillValid": false,
+      "expectedOwner": "0x4beA5744416D27E721Df679343C39380b53C1297",
+      "ownershipTransferOk": true,
+      "listingInvalidatedOk": true
+    },
+    {
+      "step": "collector_buy_signed",
+      "txHash": "0xe9c35aae0c11bfe37f74d554f34f491ede9cde5ed31c543a89439a09d00fc51b",
+      "tokenId": "2",
+      "newOwner": "0x4beA5744416D27E721Df679343C39380b53C1297",
+      "listingStillValid": false,
+      "ownershipTransferOk": true,
+      "listingInvalidatedOk": true
+    },
+    {
+      "step": "discovery_after_purchases",
+      "totalListings": 2,
+      "validListings": 1,
+      "validSignedRemaining": 1
+    },
+    {
+      "step": "nonce_invalidation",
+      "txHash": "0x6f42ca9149dba8efade725238c6bf6345ce53e1af37783108b4ac3d3ca3ef798",
+      "token3StillValid": false,
+      "nonceInvalidationOk": true
+    },
+    {
+      "step": "fee_routing_summary",
+      "protocolFeeReceivedWei": "5073363620504192",
+      "protocolFeeReceivedEth": "0.005073363620504192",
+      "expectedProtocolFeesWei": "100000000000000",
+      "marketplaceFeeReceivedWei": "-21479549641731570",
+      "marketplaceFeeReceivedEth": "-0.02147954964173157",
+      "expectedMarketplaceFeesWei": "200000000000000",
+      "treasuryAddress": "0x7Bc9427C8730b87Ab3faD10DA63F0C4b9e9E0A5F",
+      "marketplaceRecipient": "0x4beA5744416D27E721Df679343C39380b53C1297",
+      "marketplaceFeeBps": "100",
+      "royaltyRecipient": "0x7Bc9427C8730b87Ab3faD10DA63F0C4b9e9E0A5F",
+      "note": "Royalty paid to creator royalty recipient on each sale; seller proceeds returned to creator."
+    }
+  ],
+  "checks": {
+    "onchainOwnershipTransfer": true,
+    "onchainListingInvalidated": true,
+    "signedOwnershipTransfer": true,
+    "signedListingFilled": true,
+    "nonceInvalidation": true,
+    "feedSchemaValid": true,
+    "discoveryValidCountDropped": true,
+    "protocolFeeReceived": false,
+    "marketplaceFeeReceived": false
+  }
+}

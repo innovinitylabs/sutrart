@@ -6,18 +6,14 @@ import {
   getMarketplaceFeedUrlsStorageKey,
   type SignedListingFeedV1,
   type SignedListingOrder,
-} from "@sutrart/sdk";
-import { SUTRART_PROTOCOL_VERSION } from "@sutrart/shared";
+} from "@pari/sdk";
+import { PARI_PROTOCOL_VERSION } from "@pari/shared";
 import type { Address } from "viem";
-
-const LEGACY_LOCAL_SIGNED_LISTING_FEED_KEY = "sutrart:signed-listing-feed";
 
 export function loadCreatorFeed(chainId: number, creator: Address): SignedListingFeedV1 | null {
   if (typeof window === "undefined") {
     return null;
   }
-
-  migrateLegacyFeed(chainId);
 
   const raw = window.localStorage.getItem(getCreatorFeedStorageKey(chainId, creator));
   if (!raw) {
@@ -27,7 +23,7 @@ export function loadCreatorFeed(chainId: number, creator: Address): SignedListin
   try {
     return importSignedListingFeed(JSON.parse(raw));
   } catch (error) {
-    console.warn("[sutrart] Failed to parse creator feed JSON.", {
+    console.warn("[pari] Failed to parse creator feed JSON.", {
       chainId,
       creator,
       error: error instanceof Error ? error.message : String(error),
@@ -69,7 +65,7 @@ export function loadMarketplaceFeedUrls(chainId: number): string[] {
     const parsed = JSON.parse(raw) as unknown;
     return Array.isArray(parsed) ? parsed.filter((entry) => typeof entry === "string") : [];
   } catch (error) {
-    console.warn("[sutrart] Failed to parse marketplace feed URL list from localStorage.", {
+    console.warn("[pari] Failed to parse marketplace feed URL list from localStorage.", {
       chainId,
       error: error instanceof Error ? error.message : String(error),
     });
@@ -93,11 +89,6 @@ export function loadAllLocalFeeds(chainId: number, creator?: Address): SignedLis
     if (creatorFeed) {
       feeds.push(creatorFeed);
     }
-  }
-
-  const legacy = loadLegacyFeed();
-  if (legacy && legacy.chainId === chainId) {
-    feeds.push(legacy);
   }
 
   return feeds;
@@ -143,7 +134,7 @@ export function appendOrderToCreatorFeed(
         storefrontUrl,
         generatedAt: Date.now(),
         chainId,
-        protocolVersion: SUTRART_PROTOCOL_VERSION,
+        protocolVersion: PARI_PROTOCOL_VERSION,
       },
       orders: [],
     } satisfies SignedListingFeedV1);
@@ -163,46 +154,10 @@ export function appendOrderToCreatorFeed(
       storefrontUrl: existing.metadata?.storefrontUrl ?? storefrontUrl,
       generatedAt: Date.now(),
       chainId,
-      protocolVersion: SUTRART_PROTOCOL_VERSION,
+      protocolVersion: PARI_PROTOCOL_VERSION,
     },
     orders: nextOrders,
   };
 
   return saveCreatorFeed(nextFeed);
 }
-
-function loadLegacyFeed(): SignedListingFeedV1 | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  const raw = window.localStorage.getItem(LEGACY_LOCAL_SIGNED_LISTING_FEED_KEY);
-  if (!raw) {
-    return null;
-  }
-
-  try {
-    return importSignedListingFeed(JSON.parse(raw));
-  } catch (error) {
-    console.warn("[sutrart] Failed to parse legacy signed listing feed JSON.", {
-      error: error instanceof Error ? error.message : String(error),
-    });
-    return null;
-  }
-}
-
-function migrateLegacyFeed(chainId: number): void {
-  const legacy = loadLegacyFeed();
-  if (!legacy || legacy.chainId !== chainId) {
-    return;
-  }
-
-  const creator = legacy.metadata?.creator ?? legacy.orders[0]?.listing.seller;
-  if (!creator || loadCreatorFeed(chainId, creator)) {
-    return;
-  }
-
-  saveCreatorFeed(legacy);
-}
-
-export { LEGACY_LOCAL_SIGNED_LISTING_FEED_KEY };

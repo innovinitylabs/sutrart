@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-library SutrartStorage {
-    bytes32 internal constant STORAGE_POSITION = keccak256("sutrart.protocol.storage.v1");
+library PariStorage {
+    bytes32 internal constant STORAGE_POSITION = keccak256("pari.protocol.storage.v1");
 
     uint96 internal constant MAX_PROTOCOL_FEE_BPS = 1000;
     uint96 internal constant MAX_MARKETPLACE_FEE_BPS = 2500;
@@ -50,7 +50,7 @@ library SutrartStorage {
 
     function initialize(address treasury) internal {
         Layout storage ds = layout();
-        require(!ds.initialized, "SutrartStorage: already initialized");
+        require(!ds.initialized, "PariStorage: already initialized");
         require(treasury != address(0), "Protocol treasury is zero");
         ds.nextListingId = 1;
         ds.protocolFeeBps = 50;

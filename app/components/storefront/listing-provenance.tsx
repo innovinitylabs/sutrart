@@ -1,5 +1,5 @@
-import type { ListingProvenance } from "@sutrart/sdk";
-import { SUTRART_PROTOCOL_VERSION } from "@sutrart/shared";
+import type { ListingProvenance } from "@pari/sdk";
+import { PARI_PROTOCOL_VERSION } from "@pari/shared";
 import { zeroAddress } from "viem";
 
 export function ListingProvenancePanel({ provenance }: { provenance: ListingProvenance }) {
@@ -37,11 +37,13 @@ export function ListingProvenancePanel({ provenance }: { provenance: ListingProv
         </div>
         <div className="flex justify-between gap-4">
           <dt>Protocol</dt>
-          <dd className="font-mono text-foreground">{SUTRART_PROTOCOL_VERSION}</dd>
+          <dd className="font-mono text-foreground">{PARI_PROTOCOL_VERSION}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>Settlement</dt>
-          <dd className="font-mono text-foreground">{provenance.settlementSource}</dd>
+          <dd className="font-mono text-foreground">
+            {provenance.settlementSource === "pari-protocol" ? "PARI protocol" : provenance.settlementSource}
+          </dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>Royalty recipient</dt>

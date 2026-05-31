@@ -1,6 +1,6 @@
-# Sutrart
+# PARI
 
-Sutrart is a sovereign NFT listing and settlement protocol for Ethereum. Creators retain custody of NFTs, publish portable signed listing feeds, and share a chain-native settlement engine.
+PARI is creator sovereignty, cultural provenance, storefront, syndication, and marketplace interoperability infrastructure. Creators retain custody of ERC721RT assets, publish portable signed listing feeds, and share a chain-native settlement engine.
 
 **Public alpha:** `v0.1-alpha` on Ethereum Sepolia (see [docs/deployment.md](./docs/deployment.md))
 
@@ -24,6 +24,7 @@ Sutrart is a sovereign NFT listing and settlement protocol for Ethereum. Creator
 | [Deployment](./docs/deployment.md) | Anvil + Sepolia deploy runbook |
 | [Security review](./docs/security-review.md) | Alpha assumptions and limits |
 | [Gas observations](./docs/gas-observations.md) | Indicative gas notes |
+| [Brand guidelines](./docs/brand-guidelines.md) | Immutable PARI brand standards |
 
 ## Prerequisites
 
@@ -65,11 +66,11 @@ pnpm dev
 
 | Path               | Package              | Purpose                                 |
 | ------------------ | -------------------- | --------------------------------------- |
-| `app/`             | `@sutrart/app`       | Next.js reference frontend              |
-| `contracts/`       | `@sutrart/contracts` | Foundry Solidity protocol               |
-| `packages/shared/` | `@sutrart/shared`    | Chains, env helpers, constants          |
-| `packages/abi/`    | `@sutrart/abi`       | Contract ABIs (synced from Foundry)     |
-| `packages/sdk/`    | `@sutrart/sdk`       | TypeScript SDK for protocol interaction |
+| `app/`             | `@pari/app`       | Next.js reference frontend              |
+| `contracts/`       | `@pari/contracts` | Foundry Solidity protocol               |
+| `packages/shared/` | `@pari/shared`    | Chains, env helpers, constants          |
+| `packages/abi/`    | `@pari/abi`       | Contract ABIs (synced from Foundry)     |
+| `packages/sdk/`    | `@pari/sdk`       | TypeScript SDK for protocol interaction |
 | `docs/`            | —                    | Architecture and design notes           |
 
 ## Scripts
@@ -103,11 +104,11 @@ Copy `.env.example` to `app/.env.local`:
 | `SEPOLIA_RPC_URL`                      | Sepolia deploy    | Sepolia RPC endpoint                                 |
 | `DEPLOYER_PRIVATE_KEY`                 | Sepolia deploy    | Deployer private key                                 |
 
-## Not included in this scaffold
+## Not Included
 
 - Authentication (SIWE, social login, etc.)
 - Backend API, database, or indexing
-- Marketplace or listing business logic
+- Speculative trading or marketplace custody logic
 
 ## Documentation
 

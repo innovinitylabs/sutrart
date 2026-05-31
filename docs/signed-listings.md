@@ -17,9 +17,9 @@ The seller signs a typed data hash. Collectors submit the listing + signature to
 
 ## EIP-712 domain
 
-The domain separator is tied to the **Diamond address** and chain ID. Signatures are not portable across chains or deployments.
+The EIP-712 protocol name is `PARI`. The domain separator is tied to the **Diamond address** and chain ID. Signatures are not portable across chains or deployments.
 
-Domain version `"1"` is the signing domain version (see `LibSutrartEIP712`). Protocol release version is `v0.1-alpha`.
+Domain version `"1"` is the signing domain version (see `LibPariEIP712`). Protocol release version is `v0.1-alpha`.
 
 ## Nonce invalidation
 

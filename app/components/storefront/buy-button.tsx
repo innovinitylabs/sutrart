@@ -7,7 +7,7 @@ import {
   abis,
   getNormalizedListingFields,
   type MarketListing,
-} from "@sutrart/sdk";
+} from "@pari/sdk";
 import { Button } from "@/components/ui/button";
 import { StatusMessage } from "@/components/status-message";
 import { useWriteContractFeedback } from "@/lib/use-write-contract-feedback";
@@ -54,7 +54,7 @@ export function BuyButton({
     if (listing.kind === "onchain") {
       writeContract({
         address: marketAddress,
-        abi: abis.SutrartMarket,
+        abi: abis.PariMarket,
         functionName: "buyListing",
         args: [listing.listingId, marketplaceFeeRecipient, marketplaceFeeBps],
         value: normalized.price,
@@ -65,7 +65,7 @@ export function BuyButton({
 
     writeContract({
       address: marketAddress,
-      abi: abis.SutrartMarket,
+      abi: abis.PariMarket,
       functionName: "buySignedListing",
       args: [listing.listing, listing.signature, marketplaceFeeRecipient, marketplaceFeeBps],
       value: normalized.price,

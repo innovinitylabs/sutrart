@@ -11,9 +11,9 @@ const outputDir = path.resolve(__dirname, "../src/generated");
 
 const contracts = [
   {
-    sourceFile: "ISutrartMarket.sol",
-    name: "ISutrartMarket",
-    exportName: "sutrartMarketAbi",
+    sourceFile: "IPariMarket.sol",
+    name: "IPariMarket",
+    exportName: "pariMarketAbi",
   },
   {
     sourceFile: "IERC721RTFactory.sol",

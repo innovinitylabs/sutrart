@@ -8,7 +8,7 @@ import {
   buildSignedListingPath,
   getCreatorSignedListings,
   type CreatorSignedListingEntry,
-} from "@sutrart/sdk";
+} from "@pari/sdk";
 import { loadCreatorFeed } from "@/lib/syndication";
 import { useContractAddresses } from "@/lib/contracts";
 
@@ -35,7 +35,7 @@ export function CreatorStorefrontSyndication({ creatorAddress }: { creatorAddres
         const next = await getCreatorSignedListings(publicClient, marketAddress, creator, [feed]);
         setEntries(next);
       } catch (error) {
-        console.warn("[sutrart] Creator storefront syndication failed.", {
+        console.warn("[pari] Creator storefront syndication failed.", {
           chainId,
           creator,
           error: error instanceof Error ? error.message : String(error),

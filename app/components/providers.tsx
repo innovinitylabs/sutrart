@@ -4,7 +4,7 @@ import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
 import { WagmiProvider } from "wagmi";
-import { getDefaultChain } from "@sutrart/shared";
+import { getDefaultChain } from "@pari/shared";
 import { wagmiConfig } from "@/lib/wagmi/config";
 
 export function Providers({ children }: { children: ReactNode }) {

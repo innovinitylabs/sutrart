@@ -9,7 +9,7 @@ import {
   type MarketListing,
   type NormalizedListingFields,
   type PayoutPreview,
-} from "@sutrart/sdk";
+} from "@pari/sdk";
 import { BuyButton } from "@/components/storefront/buy-button";
 
 export function ListingCard({

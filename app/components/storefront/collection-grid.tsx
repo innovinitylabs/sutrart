@@ -3,7 +3,7 @@ import {
   buildCollectionStorefrontPath,
   type CollectionStorefrontSummary,
   type NormalizedCollectionMetadata,
-} from "@sutrart/sdk";
+} from "@pari/sdk";
 
 export function CollectionGrid({
   collections,
