@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "prebuild": "pnpm --filter @pari/shared --filter @pari/abi --filter @pari/sdk run build",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint"
