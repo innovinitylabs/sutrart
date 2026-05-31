@@ -1,4 +1,4 @@
-import { abis } from "@sutrart/abi";
+import { abis } from "@pari/abi";
 import type { Address, PublicClient } from "viem";
 
 export type CollectionMetadataDocument = {
@@ -72,7 +72,7 @@ export async function fetchCollectionMetadataDocument(
     const json: unknown = await response.json();
     return normalizeCollectionMetadataDocument(json);
   } catch (error) {
-    console.warn("[sutrart] Collection metadata fetch failed.", {
+    console.warn("[pari] Collection metadata fetch failed.", {
       contractURI,
       error: error instanceof Error ? error.message : String(error),
     });
@@ -153,7 +153,7 @@ export async function getTokenURI(
 
     return tokenURI || null;
   } catch (error) {
-    console.warn("[sutrart] tokenURI readContract failed.", {
+    console.warn("[pari] tokenURI readContract failed.", {
       collectionAddress,
       tokenId: tokenId.toString(),
       error: error instanceof Error ? error.message : String(error),

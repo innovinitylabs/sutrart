@@ -1,18 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
-  SUTRART_PROTOCOL_VERSION,
+  PARI_PROTOCOL_VERSION,
   validateDeploymentManifest,
-} from "@sutrart/shared";
+} from "@pari/shared";
 
 describe("validateDeploymentManifest", () => {
   it("rejects undeployed sepolia placeholder", () => {
     const result = validateDeploymentManifest({
       chainId: 11155111,
       chainName: "sepolia",
-      protocolVersion: SUTRART_PROTOCOL_VERSION,
+      protocolVersion: PARI_PROTOCOL_VERSION,
       gitCommit: "undeployed",
       deployedAt: 0,
-      SutrartMarket: "0x0000000000000000000000000000000000000000",
+      PariMarket: "0x0000000000000000000000000000000000000000",
       facets: {},
     });
 
@@ -25,10 +25,10 @@ describe("validateDeploymentManifest", () => {
     const result = validateDeploymentManifest({
       chainId: 11155111,
       chainName: "sepolia",
-      protocolVersion: SUTRART_PROTOCOL_VERSION,
+      protocolVersion: PARI_PROTOCOL_VERSION,
       gitCommit: "abc123def456",
       deployedAt: 1_700_000_000,
-      SutrartMarket: zero,
+      PariMarket: zero,
       facets: {
         DiamondCutFacet: zero,
         DiamondLoupeFacet: zero,
@@ -53,7 +53,7 @@ describe("validateDeploymentManifest", () => {
       protocolVersion: "1",
       gitCommit: "abc123",
       deployedAt: 1,
-      SutrartMarket: zero,
+      PariMarket: zero,
       facets: {
         DiamondCutFacet: zero,
         DiamondLoupeFacet: zero,

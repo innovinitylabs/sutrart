@@ -1,6 +1,6 @@
-# Sutrart Protocol Overview
+# PARI Protocol Overview
 
-Sutrart is a sovereign NFT commerce protocol built on Ethereum. It provides shared settlement infrastructure while keeping listing liquidity creator-owned and portable.
+PARI is creator sovereignty, cultural provenance, storefront, syndication, and marketplace interoperability infrastructure built on Ethereum. It provides shared settlement infrastructure while keeping listing liquidity creator-owned and portable.
 
 **Release:** `v0.1-alpha` (Sepolia public alpha)
 
@@ -23,7 +23,7 @@ Creator wallet
 Collector wallet
   └─ buyListing / buySignedListing (SettlementFacet)
 
-Shared Diamond (SutrartMarket)
+Shared Diamond (PariMarket)
   ├─ ListingFacet
   ├─ SignedListingFacet
   ├─ SettlementFacet
@@ -32,9 +32,12 @@ Shared Diamond (SutrartMarket)
   └─ ERC721RTFactoryFacet
 ```
 
-## What Sutrart is not
+## What PARI is not
 
 - Not a centralized marketplace backend
+- Not a crypto casino
+- Not an NFT flipping platform
+- Not a speculative trading platform
 - Not a recommendation engine or social graph
 - Not an orderbook or matching engine
 - Not account abstraction (no ERC-4337 / ERC-7579 in this release)
@@ -66,7 +69,7 @@ The current alpha release identifier is `v0.1-alpha`. It appears in:
 - Signed listing feed metadata
 - Frontend chain status UI
 
-This is separate from the EIP-712 signing domain version (`"1"`) used inside `LibSutrartEIP712`.
+This is separate from the EIP-712 signing domain version (`"1"`) used inside `LibPariEIP712`.
 
 ## Monorepo layout
 

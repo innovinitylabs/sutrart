@@ -3,11 +3,11 @@ pragma solidity ^0.8.28;
 
 import {MockERC721} from "../src/MockERC721.sol";
 import {MockERC721Royalty} from "../src/MockERC721Royalty.sol";
-import {ISutrartMarket} from "../src/interfaces/ISutrartMarket.sol";
+import {IPariMarket} from "../src/interfaces/IPariMarket.sol";
 import {DiamondTestHelper} from "./helpers/DiamondTestHelper.sol";
 
 contract SignedListingTest is DiamondTestHelper {
-    ISutrartMarket public market;
+    IPariMarket public market;
     MockERC721 public nft;
 
     uint256 internal sellerKey = 0xA11CE;
@@ -21,7 +21,7 @@ contract SignedListingTest is DiamondTestHelper {
 
     function setUp() public {
         seller = vm.addr(sellerKey);
-        market = _deploySutrartDiamond(address(this)).market;
+        market = _deployPariDiamond(address(this)).market;
         nft = new MockERC721();
 
         vm.prank(seller);
@@ -34,13 +34,22 @@ contract SignedListingTest is DiamondTestHelper {
 
     function test_domainSeparator_UsesDiamondAddress() public view {
         bytes32 separator = market.domainSeparator();
-        assertTrue(separator != bytes32(0));
+        bytes32 expected = keccak256(
+            abi.encode(
+                keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+                keccak256(bytes("PARI")),
+                keccak256(bytes("1")),
+                block.chainid,
+                address(market)
+            )
+        );
+        assertEq(separator, expected);
     }
 
     function test_buySignedListing_Success() public {
         market.updateProtocolFee(0);
 
-        ISutrartMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 days);
+        IPariMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 days);
         bytes memory signature = _signListing(listing);
 
         uint256 sellerBalanceBefore = seller.balance;
@@ -55,7 +64,7 @@ contract SignedListingTest is DiamondTestHelper {
     }
 
     function test_buySignedListing_RevertWhenInvalidSignature() public {
-        ISutrartMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 days);
+        IPariMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 days);
         bytes memory signature = _signListing(listing);
 
         listing.price = 2 ether;
@@ -66,7 +75,7 @@ contract SignedListingTest is DiamondTestHelper {
     }
 
     function test_buySignedListing_RevertWhenExpired() public {
-        ISutrartMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 hours);
+        IPariMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 hours);
         bytes memory signature = _signListing(listing);
 
         vm.warp(block.timestamp + 2 hours);
@@ -77,7 +86,7 @@ contract SignedListingTest is DiamondTestHelper {
     }
 
     function test_buySignedListing_RevertWhenNonceInvalidated() public {
-        ISutrartMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 days);
+        IPariMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 days);
         bytes memory signature = _signListing(listing);
 
         vm.prank(seller);
@@ -91,7 +100,7 @@ contract SignedListingTest is DiamondTestHelper {
     function test_buySignedListing_RevertWhenAlreadyFilled() public {
         market.updateProtocolFee(0);
 
-        ISutrartMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 days);
+        IPariMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 days);
         bytes memory signature = _signListing(listing);
 
         vm.prank(buyer);
@@ -107,7 +116,7 @@ contract SignedListingTest is DiamondTestHelper {
     }
 
     function test_buySignedListing_RevertWhenSellerBuysOwnListing() public {
-        ISutrartMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 days);
+        IPariMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 days);
         bytes memory signature = _signListing(listing);
 
         vm.expectRevert("Seller cannot buy own listing");
@@ -116,7 +125,7 @@ contract SignedListingTest is DiamondTestHelper {
     }
 
     function test_buySignedListing_RevertWhenNotApproved() public {
-        ISutrartMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 days);
+        IPariMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 days);
         bytes memory signature = _signListing(listing);
 
         vm.prank(seller);
@@ -131,10 +140,10 @@ contract SignedListingTest is DiamondTestHelper {
         market.updateProtocolFee(0);
 
         uint256 listingId = _createOnchainListing();
-        ISutrartMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 days);
+        IPariMarket.SignedListing memory listing = _buildListing(block.timestamp + 1 days);
 
-        ISutrartMarket.PayoutPreview memory onchainPreview = market.previewPayouts(listingId, 250);
-        ISutrartMarket.PayoutPreview memory signedPreview = market.previewSignedPayouts(listing, 250);
+        IPariMarket.PayoutPreview memory onchainPreview = market.previewPayouts(listingId, 250);
+        IPariMarket.PayoutPreview memory signedPreview = market.previewSignedPayouts(listing, 250);
 
         assertEq(signedPreview.grossPrice, onchainPreview.grossPrice);
         assertEq(signedPreview.protocolFee, onchainPreview.protocolFee);
@@ -159,7 +168,7 @@ contract SignedListingTest is DiamondTestHelper {
         market.updateProtocolFee(50);
         market.updateProtocolTreasury(treasury);
 
-        ISutrartMarket.SignedListing memory listing = ISutrartMarket.SignedListing({
+        IPariMarket.SignedListing memory listing = IPariMarket.SignedListing({
             seller: seller,
             nftContract: address(royaltyNft),
             tokenId: royaltyTokenId,
@@ -192,7 +201,7 @@ contract SignedListingTest is DiamondTestHelper {
 
         uint256 onchainListingId = _createOnchainListing();
 
-        ISutrartMarket.SignedListing memory signedListing = ISutrartMarket.SignedListing({
+        IPariMarket.SignedListing memory signedListing = IPariMarket.SignedListing({
             seller: seller,
             nftContract: address(nft),
             tokenId: TOKEN_ID + 1,
@@ -218,8 +227,8 @@ contract SignedListingTest is DiamondTestHelper {
         assertTrue(market.isListingValid(onchainListingId));
     }
 
-    function _buildListing(uint256 expiry) internal view returns (ISutrartMarket.SignedListing memory) {
-        return ISutrartMarket.SignedListing({
+    function _buildListing(uint256 expiry) internal view returns (IPariMarket.SignedListing memory) {
+        return IPariMarket.SignedListing({
             seller: seller,
             nftContract: address(nft),
             tokenId: TOKEN_ID,
@@ -229,7 +238,7 @@ contract SignedListingTest is DiamondTestHelper {
         });
     }
 
-    function _signListing(ISutrartMarket.SignedListing memory listing) internal returns (bytes memory) {
+    function _signListing(IPariMarket.SignedListing memory listing) internal returns (bytes memory) {
         vm.prank(seller);
         nft.approve(address(market), listing.tokenId);
 

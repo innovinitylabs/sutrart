@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { APP_NAME, SDK_VERSION } from "@sutrart/sdk";
+import { APP_NAME, SDK_VERSION } from "@pari/sdk";
 import { Button } from "@/components/ui/button";
 import { Nav } from "@/components/nav";
 import { WalletStatus } from "@/components/wallet-status";
@@ -14,12 +14,12 @@ export function HomeContent() {
       <div className="mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-2xl flex-col justify-center gap-10 px-6 py-16">
         <header className="space-y-4">
           <p className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
-            Sovereign NFT listings
+            Creator sovereignty infrastructure
           </p>
           <h1 className="text-4xl font-semibold tracking-tight">{APP_NAME}</h1>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            Onchain listing and settlement for Ethereum. Artists keep custody; marketplaces are
-            interfaces, not escrow owners.
+            Cultural provenance, storefronts, syndication, and marketplace interoperability for
+            creator-owned commerce.
           </p>
         </header>
 

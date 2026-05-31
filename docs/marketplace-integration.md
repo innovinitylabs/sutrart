@@ -1,6 +1,6 @@
 # Marketplace Integration
 
-Any frontend can integrate Sutrart without operating a centralized marketplace backend.
+Any frontend can integrate PARI without operating a centralized marketplace backend.
 
 ## Integration model
 
@@ -81,10 +81,10 @@ This keeps signed listings portable across marketplaces with different fee model
 ## Deployment resolution
 
 ```typescript
-import { getDeploymentManifest } from "@sutrart/shared";
+import { getDeploymentManifest } from "@pari/shared";
 
 const manifest = getDeploymentManifest(chainId);
-const market = manifest?.SutrartMarket;
+const market = manifest?.PariMarket;
 ```
 
 Returns `null` if chain is unsupported or Sepolia is not yet deployed.

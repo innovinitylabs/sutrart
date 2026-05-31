@@ -1,4 +1,4 @@
-import { abis } from "@sutrart/abi";
+import { abis } from "@pari/abi";
 import type { Address, PublicClient } from "viem";
 import { getAddress, isAddress, zeroAddress } from "viem";
 import { getCollectionCreator } from "./collection";
@@ -33,7 +33,7 @@ export type ListingProvenance = {
   tokenOwner: Address | null;
   royaltyRecipient: Address | null;
   royaltyBps: bigint | null;
-  settlementSource: "sutrart-protocol";
+  settlementSource: "pari-protocol";
   listingSource: string | null;
   structHash: `0x${string}` | null;
   listingId: bigint | null;
@@ -181,7 +181,7 @@ export async function getTokenRoyaltyInfo(
       bps: (amount * 10_000n) / referencePrice,
     };
   } catch (error) {
-    console.warn("[sutrart] royaltyInfo readContract failed.", {
+    console.warn("[pari] royaltyInfo readContract failed.", {
       collectionAddress,
       tokenId: tokenId.toString(),
       error: error instanceof Error ? error.message : String(error),
@@ -226,7 +226,7 @@ export async function buildListingProvenance(
       tokenOwner,
       royaltyRecipient: royalty.recipient,
       royaltyBps: royalty.bps,
-      settlementSource: "sutrart-protocol",
+      settlementSource: "pari-protocol",
       listingSource: "onchain-protocol",
       structHash: null,
       listingId: listing.listingId,
@@ -242,7 +242,7 @@ export async function buildListingProvenance(
     tokenOwner,
     royaltyRecipient: royalty.recipient,
     royaltyBps: royalty.bps,
-    settlementSource: "sutrart-protocol",
+    settlementSource: "pari-protocol",
     listingSource: listing.source ?? "signed-order",
     structHash: listing.structHash,
     listingId: null,

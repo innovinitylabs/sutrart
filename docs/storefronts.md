@@ -1,6 +1,6 @@
 # Storefronts
 
-Sutrart storefronts are sovereign, shareable surfaces for creator inventory and listings.
+PARI storefronts are sovereign, shareable surfaces for creator inventory and listings.
 
 ## Routes
 
@@ -28,7 +28,7 @@ No backend aggregation is required. SSR reads onchain data via RPC. Client compo
 Set in `app/.env.local`:
 
 ```env
-NEXT_PUBLIC_SIGNED_LISTING_FEED_URL=https://your-domain/sutrart-feed.json
+NEXT_PUBLIC_SIGNED_LISTING_FEED_URL=https://your-domain/pari-feed.json
 ```
 
 The storefront loader fetches this URL during SSR when configured.

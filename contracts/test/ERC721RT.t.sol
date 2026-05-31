@@ -14,7 +14,7 @@ contract ERC721RTTest is Test {
     address public royaltyReceiver = makeAddr("royaltyReceiver");
     address public attacker = makeAddr("attacker");
 
-    string internal constant NAME = "Sutrart Collection";
+    string internal constant NAME = "PARI Collection";
     string internal constant SYMBOL = "SRT";
     string internal constant BASE_URI = "https://example.com/metadata/";
     string internal constant CONTRACT_URI = "https://example.com/collection.json";

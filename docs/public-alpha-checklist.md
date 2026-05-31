@@ -6,7 +6,7 @@ Purpose: Validate the sovereign creator commerce loop end-to-end on Ethereum Sep
 
 How to use: Execute the checklist in order. Record observed issues and tx hashes. Stop only on a protocol-blocking failure.
 
-## Deployment checklist (Sutrart contracts)
+## Deployment checklist (PARI contracts)
 
 1. Configure environment
    - `SEPOLIA_RPC_URL` is set
@@ -24,7 +24,7 @@ How to use: Execute the checklist in order. Record observed issues and tx hashes
      - `protocolVersion` equals `v0.1-alpha`
      - `deployedAt` is a positive unix timestamp
      - `gitCommit` is a real commit hash (not `undeployed` or `unknown`)
-     - `SutrartMarket` and facet addresses are non-zero and checksummed
+     - `PariMarket` and facet addresses are non-zero and checksummed
 
 4. Facet registration sanity
    - Confirm `SignedListingFacet` is present
@@ -58,7 +58,7 @@ Preconditions
      - Owned tokens reflect new mints
 
 3. Approve the marketplace
-   - Approve `SutrartMarket` for each token.
+   - Approve `PariMarket` for each token.
    - Confirm:
      - Approval state updates after tx.
 

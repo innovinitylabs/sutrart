@@ -1,5 +1,5 @@
 {
-  "name": "sutrart",
+  "name": "pari",
   "private": true,
   "packageManager": "pnpm@10.7.0",
   "engines": {
@@ -7,20 +7,20 @@
     "pnpm": ">=9"
   },
   "scripts": {
-    "dev": "pnpm --filter @sutrart/app dev",
-    "build": "pnpm --filter @sutrart/shared --filter @sutrart/abi --filter @sutrart/sdk run build && pnpm --filter @sutrart/app run build",
+    "dev": "pnpm --filter @pari/app dev",
+    "build": "pnpm --filter @pari/shared --filter @pari/abi --filter @pari/sdk run build && pnpm --filter @pari/app run build",
     "lint": "pnpm -r lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "contracts:build": "pnpm --filter @sutrart/contracts build && pnpm --filter @sutrart/abi abi:sync",
-    "contracts:test": "pnpm --filter @sutrart/contracts test",
-    "contracts:fmt": "pnpm --filter @sutrart/contracts fmt",
-    "contracts:anvil": "pnpm --filter @sutrart/contracts anvil",
-    "contracts:deploy:local": "pnpm contracts:build && pnpm --filter @sutrart/contracts deploy:local",
-    "contracts:deploy:sepolia": "pnpm contracts:build && pnpm --filter @sutrart/contracts deploy:sepolia",
+    "contracts:build": "pnpm --filter @pari/contracts build && pnpm --filter @pari/abi abi:sync",
+    "contracts:test": "pnpm --filter @pari/contracts test",
+    "contracts:fmt": "pnpm --filter @pari/contracts fmt",
+    "contracts:anvil": "pnpm --filter @pari/contracts anvil",
+    "contracts:deploy:local": "pnpm contracts:build && pnpm --filter @pari/contracts deploy:local",
+    "contracts:deploy:sepolia": "pnpm contracts:build && pnpm --filter @pari/contracts deploy:sepolia",
     "manifest:validate": "node scripts/validate-deployment-manifest.mjs packages/shared/src/deployments/sepolia.json",
     "manifest:validate:local": "node scripts/validate-deployment-manifest.mjs packages/shared/src/deployments/local.json",
-    "sdk:test": "pnpm --filter @sutrart/sdk test"
+    "sdk:test": "pnpm --filter @pari/sdk test"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",

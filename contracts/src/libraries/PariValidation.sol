@@ -2,13 +2,13 @@
 pragma solidity ^0.8.28;
 
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
-import {LibSutrartEIP712} from "./LibSutrartEIP712.sol";
-import {SutrartStorage} from "./SutrartStorage.sol";
+import {LibPariEIP712} from "./LibPariEIP712.sol";
+import {PariStorage} from "./PariStorage.sol";
 
-library SutrartValidation {
+library PariValidation {
     function isListingValid(uint256 listingId) internal view returns (bool) {
-        SutrartStorage.Layout storage ds = SutrartStorage.layout();
-        SutrartStorage.Listing storage listing = ds.listings[listingId];
+        PariStorage.Layout storage ds = PariStorage.layout();
+        PariStorage.Listing storage listing = ds.listings[listingId];
 
         if (!listing.active || listing.seller == address(0)) {
             return false;
@@ -26,8 +26,8 @@ library SutrartValidation {
         return isApproved;
     }
 
-    function isSignedListingValid(SutrartStorage.SignedListing memory listing) internal view returns (bool) {
-        SutrartStorage.Layout storage ds = SutrartStorage.layout();
+    function isSignedListingValid(PariStorage.SignedListing memory listing) internal view returns (bool) {
+        PariStorage.Layout storage ds = PariStorage.layout();
 
         if (listing.seller == address(0) || listing.price == 0) {
             return false;
@@ -41,7 +41,7 @@ library SutrartValidation {
             return false;
         }
 
-        bytes32 structHash = LibSutrartEIP712.hashSignedListing(
+        bytes32 structHash = LibPariEIP712.hashSignedListing(
             listing.seller, listing.nftContract, listing.tokenId, listing.price, listing.expiry, listing.nonce
         );
 

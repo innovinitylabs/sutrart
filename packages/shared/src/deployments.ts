@@ -19,7 +19,7 @@ export type DeploymentManifest = {
   protocolVersion: string;
   gitCommit?: string;
   deployedAt: number;
-  SutrartMarket: `0x${string}`;
+  PariMarket: `0x${string}`;
   MockERC721?: `0x${string}`;
   facets?: DeploymentFacets;
 };
@@ -43,8 +43,8 @@ export function getDeploymentManifest(chainId: number): DeploymentManifest | nul
   }
 
   if (
-    !manifest.SutrartMarket ||
-    manifest.SutrartMarket === "0x0000000000000000000000000000000000000000"
+    !manifest.PariMarket ||
+    manifest.PariMarket === "0x0000000000000000000000000000000000000000"
   ) {
     return null;
   }
@@ -54,7 +54,7 @@ export function getDeploymentManifest(chainId: number): DeploymentManifest | nul
 
 export function getContractAddress(
   chainId: number,
-  contract: "SutrartMarket" | "MockERC721"
+  contract: "PariMarket" | "MockERC721"
 ): `0x${string}` | null {
   const manifest = getDeploymentManifest(chainId);
   if (!manifest) {
@@ -90,7 +90,6 @@ export function getChainDisplayName(chainId: number): string {
   return `chain-${chainId}`;
 }
 
-// Backward-compatible aliases
 export type LocalDeployment = DeploymentManifest;
 export function getDeployments(chainId: number): DeploymentManifest | null {
   return getDeploymentManifest(chainId);

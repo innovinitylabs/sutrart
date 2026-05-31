@@ -9,7 +9,7 @@ export default function MyNftsPage() {
         <div className="space-y-2">
           <h1 className="text-3xl font-semibold">My NFTs</h1>
           <p className="text-muted-foreground text-sm">
-            Mint, approve, and list NFTs on the local Sutrart market.
+            Mint, approve, and list NFTs on the local PARI market.
           </p>
         </div>
         <MyNftsPanel />

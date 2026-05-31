@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import {ERC721RT} from "../tokens/ERC721RT.sol";
 import {IERC721RTFactory} from "../interfaces/IERC721RTFactory.sol";
-import {SutrartStorage} from "../libraries/SutrartStorage.sol";
+import {PariStorage} from "../libraries/PariStorage.sol";
 
 contract ERC721RTFactoryFacet is IERC721RTFactory {
     function createCollection(
@@ -18,7 +18,7 @@ contract ERC721RTFactoryFacet is IERC721RTFactory {
         require(bytes(symbol).length > 0, "Symbol required");
         require(royaltyBps <= 10_000, "Royalty BPS too high");
 
-        SutrartStorage.Layout storage ds = SutrartStorage.layout();
+        PariStorage.Layout storage ds = PariStorage.layout();
         bytes32 salt = keccak256(abi.encode(msg.sender, name, symbol, ds.creatorCollections[msg.sender].length));
 
         collection = address(
@@ -32,10 +32,10 @@ contract ERC721RTFactoryFacet is IERC721RTFactory {
     }
 
     function getCreatorCollections(address creator) external view returns (address[] memory) {
-        return SutrartStorage.layout().creatorCollections[creator];
+        return PariStorage.layout().creatorCollections[creator];
     }
 
     function getCollectionCreator(address collection) external view returns (address) {
-        return SutrartStorage.layout().collectionCreator[collection];
+        return PariStorage.layout().collectionCreator[collection];
     }
 }

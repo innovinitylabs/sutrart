@@ -1,5 +1,5 @@
-export { abis, erc721rtAbi, erc721rtFactoryAbi, mockErc721Abi, sutrartMarketAbi } from "@sutrart/abi";
-export { APP_NAME, defaultChain, getContractAddress, supportedChains } from "@sutrart/shared";
+export { abis, erc721rtAbi, erc721rtFactoryAbi, mockErc721Abi, pariMarketAbi } from "@pari/abi";
+export { APP_NAME, defaultChain, getContractAddress, supportedChains } from "@pari/shared";
 
 export const SDK_VERSION = "0.0.0";
 
@@ -108,7 +108,7 @@ export {
   previewSignedPayouts,
   signSignedListing,
   SIGNED_LISTING_EIP712_TYPES,
-  SUTRART_EIP712_DOMAIN,
+  PARI_EIP712_DOMAIN,
   type SignedListing,
 } from "./signedListing";
 export {
@@ -128,7 +128,7 @@ export {
   removeSignedListingFromFeedByLookupKey,
   revokeSignedListings,
   SIGNED_LISTING_FEED_VERSION,
-  SUTRART_PROTOCOL_VERSION,
+  PARI_PROTOCOL_VERSION,
   validateSignedFeed,
   type CreateSignedListingFeedParams,
   type CreatorSignedListingEntry,

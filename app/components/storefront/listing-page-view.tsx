@@ -1,5 +1,5 @@
 import { formatEther, zeroAddress } from "viem";
-import type { ListingPageData } from "@sutrart/sdk";
+import type { ListingPageData } from "@pari/sdk";
 import { ListingProvenancePanel } from "@/components/storefront/listing-provenance";
 import { ListingPurchasePanel } from "@/components/storefront/listing-purchase-panel";
 

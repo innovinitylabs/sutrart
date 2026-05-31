@@ -1,4 +1,4 @@
-import { getContractAddress, getDefaultChain, getDefaultChainId, supportedChains } from "@sutrart/shared";
+import { getContractAddress, getDefaultChain, getDefaultChainId, supportedChains } from "@pari/shared";
 import { createPublicClient, http, type PublicClient } from "viem";
 
 export function getServerPublicClient(chainId = getDefaultChainId()): PublicClient {
@@ -11,5 +11,5 @@ export function getServerPublicClient(chainId = getDefaultChainId()): PublicClie
 }
 
 export function getServerMarketAddress(chainId = getDefaultChainId()) {
-  return getContractAddress(chainId, "SutrartMarket");
+  return getContractAddress(chainId, "PariMarket");
 }

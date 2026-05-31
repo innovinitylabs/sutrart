@@ -24,8 +24,8 @@ import {
   type CreatorSignedListingEntry,
   type InventoryToken,
   type SignedListingFeedV1,
-} from "@sutrart/sdk";
-import { getChainDisplayName, getAppUrl } from "@sutrart/shared";
+} from "@pari/sdk";
+import { getChainDisplayName, getAppUrl } from "@pari/shared";
 import { Button } from "@/components/ui/button";
 import { SignedListingStateHint } from "@/components/listing-validity-badge";
 import { StatusMessage } from "@/components/status-message";
@@ -206,7 +206,7 @@ export function CreatorSignedListingsPanel({
 
     writeContract({
       address: marketAddress,
-      abi: abis.SutrartMarket,
+      abi: abis.PariMarket,
       functionName: "incrementSignedListingNonce",
     });
     setPendingStatus("Revoking all signed listings below current nonce...");
@@ -254,7 +254,7 @@ export function CreatorSignedListingsPanel({
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `sutrart-feed-${feed.metadata?.creator ?? "creator"}.json`;
+    anchor.download = `pari-feed-${feed.metadata?.creator ?? "creator"}.json`;
     anchor.click();
     URL.revokeObjectURL(url);
     setStatus("Exported feed JSON.");
@@ -295,7 +295,7 @@ export function CreatorSignedListingsPanel({
         <h2 className="text-lg font-medium">Signed listing syndication</h2>
         <p className="text-sm text-muted-foreground">
           Sign portable listings, publish to your creator feed, and syndicate into storefront and
-          marketplace discovery. Wallet signing uses EIP-712 typed data tied to the Sutrart market
+          marketplace discovery. Wallet signing uses EIP-712 typed data tied to the PARI market
           contract on this chain.
         </p>
         {address ? (

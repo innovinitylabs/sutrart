@@ -54,10 +54,10 @@ function validateDeploymentManifest(input) {
     issues.push({ path: "gitCommit", message: "gitCommit must be a real deployment commit hash" });
   }
 
-  if (!input.SutrartMarket || !isEthAddress(input.SutrartMarket)) {
-    issues.push({ path: "SutrartMarket", message: "SutrartMarket must be a valid address" });
-  } else if (input.SutrartMarket.toLowerCase() === ZERO_ADDRESS) {
-    issues.push({ path: "SutrartMarket", message: "SutrartMarket must not be the zero address" });
+  if (!input.PariMarket || !isEthAddress(input.PariMarket)) {
+    issues.push({ path: "PariMarket", message: "PariMarket must be a valid address" });
+  } else if (input.PariMarket.toLowerCase() === ZERO_ADDRESS) {
+    issues.push({ path: "PariMarket", message: "PariMarket must not be the zero address" });
   }
 
   if (!input.facets || typeof input.facets !== "object") {
@@ -98,4 +98,4 @@ console.log(`Manifest valid: ${manifestPath}`);
 console.log(`  chainId: ${manifest.chainId}`);
 console.log(`  chainName: ${manifest.chainName}`);
 console.log(`  protocolVersion: ${manifest.protocolVersion}`);
-console.log(`  SutrartMarket: ${manifest.SutrartMarket}`);
+console.log(`  PariMarket: ${manifest.PariMarket}`);

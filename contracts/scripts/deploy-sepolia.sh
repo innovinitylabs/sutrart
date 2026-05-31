@@ -17,7 +17,7 @@ MANIFEST_PATH="${ROOT_DIR}/packages/shared/src/deployments/sepolia.json"
 
 export GIT_COMMIT="${GIT_COMMIT:-$(git -C "${ROOT_DIR}" rev-parse HEAD)}"
 
-echo "Deploying Sutrart Diamond to Sepolia..."
+echo "Deploying PARI Diamond to Sepolia..."
 echo "Git commit: ${GIT_COMMIT}"
 echo "Protocol version: v0.1-alpha"
 

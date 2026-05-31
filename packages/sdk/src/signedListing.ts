@@ -1,4 +1,4 @@
-import { abis } from "@sutrart/abi";
+import { abis } from "@pari/abi";
 import type { Address, PublicClient, WalletClient } from "viem";
 
 export type SignedListing = {
@@ -10,8 +10,8 @@ export type SignedListing = {
   nonce: bigint;
 };
 
-export const SUTRART_EIP712_DOMAIN = {
-  name: "Sutrart",
+export const PARI_EIP712_DOMAIN = {
+  name: "PARI",
   version: "1",
 } as const;
 
@@ -32,7 +32,7 @@ export async function getDomainSeparator(
 ): Promise<`0x${string}`> {
   return publicClient.readContract({
     address: marketAddress,
-    abi: abis.SutrartMarket,
+    abi: abis.PariMarket,
     functionName: "domainSeparator",
   });
 }
@@ -44,7 +44,7 @@ export async function getSignedListingMinNonce(
 ): Promise<bigint> {
   return publicClient.readContract({
     address: marketAddress,
-    abi: abis.SutrartMarket,
+    abi: abis.PariMarket,
     functionName: "signedListingMinNonce",
     args: [seller],
   });
@@ -57,7 +57,7 @@ export async function hashSignedListing(
 ): Promise<`0x${string}`> {
   return publicClient.readContract({
     address: marketAddress,
-    abi: abis.SutrartMarket,
+    abi: abis.PariMarket,
     functionName: "hashSignedListing",
     args: [listing],
   });
@@ -70,7 +70,7 @@ export async function isSignedListingValid(
 ): Promise<boolean> {
   return publicClient.readContract({
     address: marketAddress,
-    abi: abis.SutrartMarket,
+    abi: abis.PariMarket,
     functionName: "isSignedListingValid",
     args: [listing],
   });
@@ -84,7 +84,7 @@ export async function previewSignedPayouts(
 ) {
   const result = await publicClient.readContract({
     address: marketAddress,
-    abi: abis.SutrartMarket,
+    abi: abis.PariMarket,
     functionName: "previewSignedPayouts",
     args: [listing, marketplaceFeeBps],
   });
@@ -113,7 +113,7 @@ export async function signSignedListing(
   return walletClient.signTypedData({
     account,
     domain: {
-      ...SUTRART_EIP712_DOMAIN,
+      ...PARI_EIP712_DOMAIN,
       chainId,
       verifyingContract: marketAddress,
     },

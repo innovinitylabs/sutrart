@@ -1,7 +1,7 @@
 "use client";
 
 import { zeroAddress } from "viem";
-import type { MarketListing } from "@sutrart/sdk";
+import type { MarketListing } from "@pari/sdk";
 import { BuyButton } from "@/components/storefront/buy-button";
 
 export function ListingPurchasePanel({
@@ -15,7 +15,7 @@ export function ListingPurchasePanel({
     <section className="space-y-3 rounded-lg border border-border p-4">
       <p className="text-sm font-medium">Settlement</p>
       <p className="text-xs text-muted-foreground">
-        Purchases settle through the Sutrart protocol diamond.
+        Purchases settle through the PARI protocol diamond.
       </p>
       <BuyButton
         listing={listing}

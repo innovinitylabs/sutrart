@@ -1,6 +1,6 @@
 # Deployment
 
-Sutrart supports deterministic Diamond deployment with JSON manifests for local Anvil and Ethereum Sepolia.
+PARI supports deterministic Diamond deployment with JSON manifests for local Anvil and Ethereum Sepolia.
 
 **Protocol version:** `v0.1-alpha`
 
@@ -13,7 +13,7 @@ Sutrart supports deterministic Diamond deployment with JSON manifests for local 
   "protocolVersion": "v0.1-alpha",
   "gitCommit": "abc123...",
   "deployedAt": 1710000000,
-  "SutrartMarket": "0x...",
+  "PariMarket": "0x...",
   "MockERC721": "0x...",
   "facets": {
     "DiamondCutFacet": "0x...",
@@ -31,7 +31,7 @@ Sutrart supports deterministic Diamond deployment with JSON manifests for local 
 
 Manifests live in `packages/shared/src/deployments/`.
 
-`getDeploymentManifest(chainId)` returns `null` when `SutrartMarket` is zero — Sepolia placeholder starts undeployed.
+`getDeploymentManifest(chainId)` returns `null` when `PariMarket` is zero — Sepolia placeholder starts undeployed.
 
 ## Local Anvil
 
@@ -69,7 +69,7 @@ This:
 1. Sets `GIT_COMMIT` from current HEAD
 2. Broadcasts `DeploySepolia.s.sol`
 3. Writes `packages/shared/src/deployments/sepolia.json`
-4. Builds `@sutrart/shared`
+4. Builds `@pari/shared`
 5. Validates manifest via `scripts/validate-deployment-manifest.mjs`
 
 ## Frontend chain config
@@ -92,7 +92,7 @@ NEXT_PUBLIC_SIGNED_LISTING_FEED_URL=https://...
 ## Manifest validation
 
 ```bash
-pnpm --filter @sutrart/shared build
+pnpm --filter @pari/shared build
 node scripts/validate-deployment-manifest.mjs packages/shared/src/deployments/sepolia.json
 ```
 

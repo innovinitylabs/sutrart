@@ -1,6 +1,6 @@
-# Sutrart Contracts
+# PARI Contracts
 
-Foundry project for the Sutrart protocol on Ethereum.
+Foundry project for the PARI protocol on Ethereum.
 
 ## Philosophy
 

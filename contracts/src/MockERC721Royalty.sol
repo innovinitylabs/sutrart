@@ -11,7 +11,7 @@ contract MockERC721Royalty is ERC721, ERC2981 {
     address private _rawReceiver;
     uint96 private _rawFraction;
 
-    constructor() ERC721("Sutrart Mock Royalty NFT", "SMRNFT") {}
+    constructor() ERC721("PARI Mock Royalty NFT", "SMRNFT") {}
 
     function mint(address to) external returns (uint256 tokenId) {
         tokenId = nextTokenId;

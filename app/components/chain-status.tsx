@@ -3,11 +3,11 @@
 import { sepolia } from "viem/chains";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import {
-  SUTRART_PROTOCOL_VERSION,
+  PARI_PROTOCOL_VERSION,
   getChainDisplayName,
   getDefaultChain,
   isSupportedDeploymentChain,
-} from "@sutrart/shared";
+} from "@pari/shared";
 import { useContractAddresses } from "@/lib/contracts";
 import { Button } from "@/components/ui/button";
 
@@ -30,7 +30,7 @@ export function ChainStatus() {
           Active chain: <span className="font-medium">{chainName}</span> ({chainId})
         </p>
         <span className="text-xs uppercase tracking-wide text-muted-foreground">
-          Protocol {SUTRART_PROTOCOL_VERSION}
+          Protocol {PARI_PROTOCOL_VERSION}
           {isSepolia ? " · Sepolia alpha" : null}
         </span>
       </div>
@@ -51,7 +51,7 @@ export function ChainStatus() {
       {isConnected && !isSupportedChain ? (
         <div className="mt-2 space-y-2">
           <p className="text-xs text-amber-700">
-            No Sutrart deployment manifest is available for this network. Switch to a supported alpha
+            No PARI deployment manifest is available for this network. Switch to a supported alpha
             chain to continue.
           </p>
           <div className="flex flex-wrap gap-2">

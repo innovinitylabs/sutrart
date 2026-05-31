@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@sutrart/shared", "@sutrart/sdk"],
+  transpilePackages: ["@pari/shared", "@pari/sdk"],
 };
 
 export default nextConfig;

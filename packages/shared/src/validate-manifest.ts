@@ -1,5 +1,5 @@
 import { isAddress } from "viem";
-import { SUTRART_PROTOCOL_VERSION } from "./constants";
+import { PARI_PROTOCOL_VERSION } from "./constants";
 import type { DeploymentFacets, DeploymentManifest } from "./deployments";
 
 const REQUIRED_FACETS: (keyof DeploymentFacets)[] = [
@@ -43,10 +43,10 @@ export function validateDeploymentManifest(input: unknown): ManifestValidationRe
 
   if (typeof manifest.protocolVersion !== "string" || manifest.protocolVersion.length === 0) {
     issues.push({ path: "protocolVersion", message: "protocolVersion is required" });
-  } else if (manifest.protocolVersion !== SUTRART_PROTOCOL_VERSION) {
+  } else if (manifest.protocolVersion !== PARI_PROTOCOL_VERSION) {
     issues.push({
       path: "protocolVersion",
-      message: `Expected protocolVersion "${SUTRART_PROTOCOL_VERSION}", got "${manifest.protocolVersion}"`,
+      message: `Expected protocolVersion "${PARI_PROTOCOL_VERSION}", got "${manifest.protocolVersion}"`,
     });
   }
 
@@ -60,10 +60,10 @@ export function validateDeploymentManifest(input: unknown): ManifestValidationRe
     issues.push({ path: "gitCommit", message: "gitCommit must be a real deployment commit hash" });
   }
 
-  if (!manifest.SutrartMarket || !isAddress(manifest.SutrartMarket)) {
-    issues.push({ path: "SutrartMarket", message: "SutrartMarket must be a valid address" });
-  } else if (manifest.SutrartMarket === "0x0000000000000000000000000000000000000000") {
-    issues.push({ path: "SutrartMarket", message: "SutrartMarket must not be the zero address" });
+  if (!manifest.PariMarket || !isAddress(manifest.PariMarket)) {
+    issues.push({ path: "PariMarket", message: "PariMarket must be a valid address" });
+  } else if (manifest.PariMarket === "0x0000000000000000000000000000000000000000") {
+    issues.push({ path: "PariMarket", message: "PariMarket must not be the zero address" });
   }
 
   if (!manifest.facets || typeof manifest.facets !== "object") {

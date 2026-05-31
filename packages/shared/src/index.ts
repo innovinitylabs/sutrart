@@ -1,4 +1,5 @@
-export { APP_NAME, SUTRART_PROTOCOL_VERSION } from "./constants";
+export { APP_NAME, PARI_PROTOCOL_VERSION } from "./constants";
+export { PARI_BRAND, type PariBrand } from "./brand";
 export { defaultChain, getDefaultChain, supportedChains, type SupportedChain } from "./chains";
 export {
   getAppUrl,

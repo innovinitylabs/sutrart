@@ -1,4 +1,4 @@
-import { abis } from "@sutrart/abi";
+import { abis } from "@pari/abi";
 import type { Address, PublicClient } from "viem";
 import {
   getCollectionOwnedTokenIds,

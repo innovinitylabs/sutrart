@@ -1,5 +1,5 @@
 {
-  "name": "@sutrart/sdk",
+  "name": "@pari/sdk",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -17,8 +17,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@sutrart/abi": "workspace:*",
-    "@sutrart/shared": "workspace:*",
+    "@pari/abi": "workspace:*",
+    "@pari/shared": "workspace:*",
     "viem": "^2.31.0"
   },
   "devDependencies": {

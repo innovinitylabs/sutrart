@@ -1,6 +1,6 @@
 import type { Address, PublicClient } from "viem";
 import { getAddress, isAddress, zeroAddress } from "viem";
-import { SUTRART_PROTOCOL_VERSION } from "@sutrart/shared";
+import { PARI_PROTOCOL_VERSION } from "@pari/shared";
 import { listingLookupKey } from "./inventory";
 import {
   discoverSignedMarketListings,
@@ -13,7 +13,7 @@ import {
 import { hashSignedListing, isSignedListingValid, type SignedListing } from "./signedListing";
 
 export const SIGNED_LISTING_FEED_VERSION = 1 as const;
-export { SUTRART_PROTOCOL_VERSION } from "@sutrart/shared";
+export { PARI_PROTOCOL_VERSION } from "@pari/shared";
 
 export type SignedListingFeedMetadata = {
   creator: Address;
@@ -71,7 +71,7 @@ export function createSignedListingFeed(params: CreateSignedListingFeedParams): 
       storefrontUrl: params.storefrontUrl,
       generatedAt: Date.now(),
       chainId: params.chainId,
-      protocolVersion: SUTRART_PROTOCOL_VERSION,
+      protocolVersion: PARI_PROTOCOL_VERSION,
     },
     orders: [],
   };
@@ -120,7 +120,7 @@ export function publishSignedListing(params: PublishSignedListingParams): Signed
       storefrontUrl: params.feed.metadata?.storefrontUrl,
       generatedAt: Date.now(),
       chainId: params.feed.chainId,
-      protocolVersion: params.feed.metadata?.protocolVersion ?? SUTRART_PROTOCOL_VERSION,
+      protocolVersion: params.feed.metadata?.protocolVersion ?? PARI_PROTOCOL_VERSION,
     },
     orders: nextOrders,
   };
@@ -192,7 +192,7 @@ export function mergeSignedFeeds(
       storefrontUrl: first.metadata?.storefrontUrl,
       generatedAt: Date.now(),
       chainId: resolvedChainId,
-      protocolVersion: SUTRART_PROTOCOL_VERSION,
+      protocolVersion: PARI_PROTOCOL_VERSION,
     },
     orders: [...orderIndex.values()],
   };
@@ -220,7 +220,7 @@ export function validateSignedFeed(input: unknown): SignedFeedValidationResult {
         });
       }
 
-      if (feed.metadata.protocolVersion !== SUTRART_PROTOCOL_VERSION) {
+      if (feed.metadata.protocolVersion !== PARI_PROTOCOL_VERSION) {
         issues.push({
           path: "metadata.protocolVersion",
           message: "Unsupported protocol version in metadata",
@@ -330,9 +330,9 @@ export function revokeSignedListings(marketAddress: Address) {
 }
 
 export function getCreatorFeedStorageKey(chainId: number, creator: Address): string {
-  return `sutrart:creator-feed:${chainId}:${creator.toLowerCase()}`;
+  return `pari:creator-feed:${chainId}:${creator.toLowerCase()}`;
 }
 
 export function getMarketplaceFeedUrlsStorageKey(chainId: number): string {
-  return `sutrart:marketplace-feed-urls:${chainId}`;
+  return `pari:marketplace-feed-urls:${chainId}`;
 }

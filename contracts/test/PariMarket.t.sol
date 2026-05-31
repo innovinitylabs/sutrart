@@ -2,11 +2,11 @@
 pragma solidity ^0.8.28;
 
 import {MockERC721} from "../src/MockERC721.sol";
-import {ISutrartMarket} from "../src/interfaces/ISutrartMarket.sol";
+import {IPariMarket} from "../src/interfaces/IPariMarket.sol";
 import {DiamondTestHelper} from "./helpers/DiamondTestHelper.sol";
 
-contract SutrartMarketTest is DiamondTestHelper {
-    ISutrartMarket public market;
+contract PariMarketTest is DiamondTestHelper {
+    IPariMarket public market;
     MockERC721 public nft;
 
     address public seller = makeAddr("seller");
@@ -18,7 +18,7 @@ contract SutrartMarketTest is DiamondTestHelper {
     uint256 internal constant PRICE = 1 ether;
 
     function setUp() public {
-        market = _deploySutrartDiamond(address(this)).market;
+        market = _deployPariDiamond(address(this)).market;
         nft = new MockERC721();
 
         vm.prank(seller);
@@ -274,7 +274,7 @@ contract SutrartMarketTest is DiamondTestHelper {
         market.updateProtocolTreasury(attacker);
 
         uint256 listingId = _createListing();
-        ISutrartMarket.PayoutPreview memory preview = market.previewPayouts(listingId, marketplaceBps);
+        IPariMarket.PayoutPreview memory preview = market.previewPayouts(listingId, marketplaceBps);
 
         uint256 sellerBalanceBefore = seller.balance;
         uint256 treasuryBalanceBefore = attacker.balance;

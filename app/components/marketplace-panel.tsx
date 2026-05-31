@@ -14,7 +14,7 @@ import {
   type MarketListing,
   type PayoutPreview,
   type SignedListingFeedV1,
-} from "@sutrart/sdk";
+} from "@pari/sdk";
 import { ChainStatus } from "@/components/chain-status";
 import { FeedIngestionPanel } from "@/components/feed-ingestion-panel";
 import { ListingValidityBadge } from "@/components/listing-validity-badge";
@@ -191,7 +191,7 @@ export function MarketplacePanel() {
     if (listing.kind === "onchain") {
       writeContract({
         address: marketAddress,
-        abi: abis.SutrartMarket,
+        abi: abis.PariMarket,
         functionName: "buyListing",
         args: [listing.listingId, marketplaceFeeRecipient, marketplaceFeeBps],
         value: listing.price,
@@ -202,7 +202,7 @@ export function MarketplacePanel() {
 
     writeContract({
       address: marketAddress,
-      abi: abis.SutrartMarket,
+      abi: abis.PariMarket,
       functionName: "buySignedListing",
       args: [listing.listing, listing.signature, marketplaceFeeRecipient, marketplaceFeeBps],
       value: normalized.price,
@@ -248,7 +248,7 @@ export function MarketplacePanel() {
               try {
                 setImportedFeeds([mergeSignedFeeds(feeds)]);
               } catch (error) {
-                console.warn("[sutrart] mergeSignedFeeds failed in marketplace ingest panel.", {
+                console.warn("[pari] mergeSignedFeeds failed in marketplace ingest panel.", {
                   chainId,
                   error: error instanceof Error ? error.message : String(error),
                 });

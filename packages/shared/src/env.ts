@@ -11,7 +11,7 @@ export function getWalletConnectProjectId(): string {
   if (!projectId) {
     if (process.env.NODE_ENV === "development") {
       console.warn(
-        "[sutrart] NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is not set. Wallet connection will not work."
+        "[pari] NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is not set. Wallet connection will not work."
       );
     }
     return "";

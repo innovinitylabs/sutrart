@@ -1,4 +1,4 @@
-export const sutrartMarketAbi = [
+export const pariMarketAbi = [
   {
     "type": "function",
     "name": "MAX_MARKETPLACE_FEE_BPS",
@@ -55,7 +55,7 @@ export const sutrartMarketAbi = [
       {
         "name": "listing",
         "type": "tuple",
-        "internalType": "struct ISutrartMarket.SignedListing",
+        "internalType": "struct IPariMarket.SignedListing",
         "components": [
           {
             "name": "seller",
@@ -160,7 +160,7 @@ export const sutrartMarketAbi = [
       {
         "name": "listing",
         "type": "tuple",
-        "internalType": "struct ISutrartMarket.SignedListing",
+        "internalType": "struct IPariMarket.SignedListing",
         "components": [
           {
             "name": "seller",
@@ -237,7 +237,7 @@ export const sutrartMarketAbi = [
       {
         "name": "listing",
         "type": "tuple",
-        "internalType": "struct ISutrartMarket.SignedListing",
+        "internalType": "struct IPariMarket.SignedListing",
         "components": [
           {
             "name": "seller",
@@ -404,7 +404,7 @@ export const sutrartMarketAbi = [
       {
         "name": "",
         "type": "tuple",
-        "internalType": "struct ISutrartMarket.PayoutPreview",
+        "internalType": "struct IPariMarket.PayoutPreview",
         "components": [
           {
             "name": "grossPrice",
@@ -448,7 +448,7 @@ export const sutrartMarketAbi = [
       {
         "name": "listing",
         "type": "tuple",
-        "internalType": "struct ISutrartMarket.SignedListing",
+        "internalType": "struct IPariMarket.SignedListing",
         "components": [
           {
             "name": "seller",
@@ -492,7 +492,7 @@ export const sutrartMarketAbi = [
       {
         "name": "",
         "type": "tuple",
-        "internalType": "struct ISutrartMarket.PayoutPreview",
+        "internalType": "struct IPariMarket.PayoutPreview",
         "components": [
           {
             "name": "grossPrice",

@@ -4,12 +4,12 @@ pragma solidity ^0.8.28;
 import {Test} from "forge-std/Test.sol";
 import {ERC721RT} from "../src/tokens/ERC721RT.sol";
 import {IERC721RTFactory} from "../src/interfaces/IERC721RTFactory.sol";
-import {ISutrartMarket} from "../src/interfaces/ISutrartMarket.sol";
+import {IPariMarket} from "../src/interfaces/IPariMarket.sol";
 import {DiamondTestHelper} from "./helpers/DiamondTestHelper.sol";
 
 contract CreatorInventoryTest is DiamondTestHelper {
     IERC721RTFactory public factory;
-    ISutrartMarket public market;
+    IPariMarket public market;
 
     address public creator = makeAddr("creator");
     address public buyer = makeAddr("buyer");
@@ -20,7 +20,7 @@ contract CreatorInventoryTest is DiamondTestHelper {
     uint256 internal constant LISTING_PRICE = 1 ether;
 
     function setUp() public {
-        SutrartDiamondDeployment memory deployment = _deploySutrartDiamond(address(this));
+        PariDiamondDeployment memory deployment = _deployPariDiamond(address(this));
         factory = IERC721RTFactory(address(deployment.diamond));
         market = deployment.market;
 

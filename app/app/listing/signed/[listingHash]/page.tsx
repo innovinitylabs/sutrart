@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getListingPageData, normalizeListingHashParam } from "@sutrart/sdk";
+import { getListingPageData, normalizeListingHashParam } from "@pari/sdk";
 import { Nav } from "@/components/nav";
 import { ListingPageView } from "@/components/storefront/listing-page-view";
 import { getServerMarketAddress, getServerPublicClient } from "@/lib/chain";

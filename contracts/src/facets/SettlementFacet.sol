@@ -1,42 +1,42 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {ISutrartMarket} from "../interfaces/ISutrartMarket.sol";
-import {SutrartPayouts} from "../libraries/SutrartPayouts.sol";
-import {SutrartSettlement} from "../libraries/SutrartSettlement.sol";
-import {SutrartStorage} from "../libraries/SutrartStorage.sol";
-import {SutrartValidation} from "../libraries/SutrartValidation.sol";
+import {IPariMarket} from "../interfaces/IPariMarket.sol";
+import {PariPayouts} from "../libraries/PariPayouts.sol";
+import {PariSettlement} from "../libraries/PariSettlement.sol";
+import {PariStorage} from "../libraries/PariStorage.sol";
+import {PariValidation} from "../libraries/PariValidation.sol";
 
 contract SettlementFacet {
     function previewPayouts(uint256 listingId, uint96 marketplaceFeeBps)
         external
         view
-        returns (ISutrartMarket.PayoutPreview memory)
+        returns (IPariMarket.PayoutPreview memory)
     {
-        SutrartStorage.Listing storage listing = SutrartStorage.layout().listings[listingId];
+        PariStorage.Listing storage listing = PariStorage.layout().listings[listingId];
         require(listing.seller != address(0), "Listing does not exist");
 
         return
-            SutrartPayouts.computePayoutPreview(listing.nftContract, listing.tokenId, listing.price, marketplaceFeeBps);
+            PariPayouts.computePayoutPreview(listing.nftContract, listing.tokenId, listing.price, marketplaceFeeBps);
     }
 
     function buyListing(uint256 listingId, address marketplaceFeeRecipient, uint96 marketplaceFeeBps) external payable {
-        SutrartStorage.enterNonReentrant();
+        PariStorage.enterNonReentrant();
         _buyListing(listingId, marketplaceFeeRecipient, marketplaceFeeBps);
-        SutrartStorage.exitNonReentrant();
+        PariStorage.exitNonReentrant();
     }
 
     function _buyListing(uint256 listingId, address marketplaceFeeRecipient, uint96 marketplaceFeeBps) private {
-        SutrartStorage.Layout storage ds = SutrartStorage.layout();
-        SutrartStorage.Listing storage listing = ds.listings[listingId];
+        PariStorage.Layout storage ds = PariStorage.layout();
+        PariStorage.Listing storage listing = ds.listings[listingId];
 
-        require(SutrartValidation.isListingValid(listingId), "Listing is not valid");
+        require(PariValidation.isListingValid(listingId), "Listing is not valid");
         require(msg.sender != listing.seller, "Seller cannot buy own listing");
         require(msg.value == listing.price, "Incorrect ETH amount");
 
         listing.active = false;
 
-        ISutrartMarket.PayoutPreview memory payout = SutrartSettlement.executeSale(
+        IPariMarket.PayoutPreview memory payout = PariSettlement.executeSale(
             listing.seller,
             msg.sender,
             listing.nftContract,
@@ -46,7 +46,7 @@ contract SettlementFacet {
             marketplaceFeeBps
         );
 
-        emit ISutrartMarket.ListingSold(
+        emit IPariMarket.ListingSold(
             listingId,
             listing.seller,
             msg.sender,

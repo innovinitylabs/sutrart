@@ -1,7 +1,7 @@
 "use client";
 
-import type { MarketListing } from "@sutrart/sdk";
-import { getNormalizedListingFields } from "@sutrart/sdk";
+import type { MarketListing } from "@pari/sdk";
+import { getNormalizedListingFields } from "@pari/sdk";
 
 export function ListingValidityBadge({ listing }: { listing: MarketListing }) {
   const normalized = getNormalizedListingFields(listing);
