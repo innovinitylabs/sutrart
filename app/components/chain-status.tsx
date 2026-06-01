@@ -4,6 +4,7 @@ import { baseSepolia, sepolia } from "viem/chains";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import {
   PARI_PROTOCOL_VERSION,
+  alphaChains,
   getChainDisplayName,
   getDefaultChain,
   isSupportedDeploymentChain,
@@ -11,7 +12,7 @@ import {
 import { useContractAddresses } from "@/lib/contracts";
 import { Button } from "@/components/ui/button";
 
-const alphaChains = [getDefaultChain(), sepolia, baseSepolia] as const;
+const switchableAlphaChains = [getDefaultChain(), ...alphaChains.filter((chain) => chain.id !== getDefaultChain().id)];
 
 export function ChainStatus() {
   const chainId = useChainId();
@@ -57,7 +58,7 @@ export function ChainStatus() {
             chain to continue.
           </p>
           <div className="flex flex-wrap gap-2">
-            {alphaChains.map((target) => (
+            {switchableAlphaChains.map((target) => (
               <Button
                 key={target.id}
                 type="button"

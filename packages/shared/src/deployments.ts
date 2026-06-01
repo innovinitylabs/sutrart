@@ -90,6 +90,10 @@ export function getChainDisplayName(chainId: number): string {
     return "base-sepolia";
   }
 
+  if (chainId === 1) {
+    return "mainnet";
+  }
+
   if (chainId === 31337) {
     return "anvil";
   }

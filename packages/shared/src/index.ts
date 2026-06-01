@@ -1,11 +1,22 @@
 export { APP_NAME, PARI_PROTOCOL_VERSION } from "./constants.js";
 export { PARI_BRAND, type PariBrand } from "./brand.js";
-export { defaultChain, getDefaultChain, supportedChains, type SupportedChain } from "./chains.js";
+export {
+  alphaChains,
+  defaultChain,
+  futureChains,
+  getDefaultChain,
+  getWalletChains,
+  supportedChains,
+  type AlphaChain,
+  type SupportedChain,
+} from "./chains.js";
 export {
   getAppUrl,
   getBaseSepoliaRpcUrl,
   getDefaultChainId,
+  getMainnetRpcUrl,
   getPublicBaseSepoliaRpcUrl,
+  getPublicMainnetRpcUrl,
   getPublicSepoliaRpcUrl,
   getSepoliaRpcUrl,
   getSignedListingFeedUrl,
