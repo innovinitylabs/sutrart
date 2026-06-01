@@ -1,10 +1,11 @@
-import { anvil, arbitrum, base, mainnet, optimism, polygon, sepolia } from "viem/chains";
+import { anvil, arbitrum, base, baseSepolia, mainnet, optimism, polygon, sepolia } from "viem/chains";
 import { getDefaultChainId } from "./env.js";
 
 export const supportedChains = [
   anvil,
   mainnet,
   sepolia,
+  baseSepolia,
   polygon,
   optimism,
   arbitrum,

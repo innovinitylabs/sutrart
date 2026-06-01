@@ -1,4 +1,5 @@
 import {
+  getBaseSepoliaRpcUrl,
   getContractAddress,
   getDefaultChain,
   getDefaultChainId,
@@ -6,11 +7,14 @@ import {
   supportedChains,
 } from "@pari/shared";
 import { createPublicClient, http, type PublicClient } from "viem";
-import { anvil, sepolia } from "viem/chains";
+import { anvil, baseSepolia, sepolia } from "viem/chains";
 
 function getServerRpcUrl(chainId: number): string | undefined {
   if (chainId === sepolia.id) {
     return getSepoliaRpcUrl();
+  }
+  if (chainId === baseSepolia.id) {
+    return getBaseSepoliaRpcUrl();
   }
   if (chainId === anvil.id) {
     return "http://127.0.0.1:8545";

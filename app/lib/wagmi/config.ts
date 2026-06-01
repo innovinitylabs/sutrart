@@ -1,31 +1,50 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
-import { APP_NAME, getPublicSepoliaRpcUrl, getWalletConnectProjectId, supportedChains } from "@pari/shared";
+import {
+  APP_NAME,
+  getPublicBaseSepoliaRpcUrl,
+  getPublicSepoliaRpcUrl,
+  getWalletConnectProjectId,
+  supportedChains,
+} from "@pari/shared";
 import type { Chain } from "viem";
-import { sepolia } from "viem/chains";
+import { baseSepolia, sepolia } from "viem/chains";
 import type { Config } from "wagmi";
 
 const projectId = getWalletConnectProjectId() || "00000000000000000000000000000000";
 
-function buildSepoliaChain(): Chain {
-  const sepoliaRpcUrl = getPublicSepoliaRpcUrl();
-  if (!sepoliaRpcUrl) {
-    return sepolia;
+function buildChainWithRpc(chain: Chain, rpcUrl: string | undefined): Chain {
+  if (!rpcUrl) {
+    return chain;
   }
 
   return {
-    ...sepolia,
+    ...chain,
     rpcUrls: {
-      ...sepolia.rpcUrls,
+      ...chain.rpcUrls,
       default: {
-        http: [sepoliaRpcUrl],
+        http: [rpcUrl],
       },
     },
   };
 }
 
-const chains: Chain[] = supportedChains.map((chain) =>
-  chain.id === sepolia.id ? buildSepoliaChain() : chain
-);
+function buildSepoliaChain(): Chain {
+  return buildChainWithRpc(sepolia, getPublicSepoliaRpcUrl());
+}
+
+function buildBaseSepoliaChain(): Chain {
+  return buildChainWithRpc(baseSepolia, getPublicBaseSepoliaRpcUrl());
+}
+
+const chains: Chain[] = supportedChains.map((chain) => {
+  if (chain.id === sepolia.id) {
+    return buildSepoliaChain();
+  }
+  if (chain.id === baseSepolia.id) {
+    return buildBaseSepoliaChain();
+  }
+  return chain;
+});
 
 export const wagmiConfig: Config = getDefaultConfig({
   appName: APP_NAME,

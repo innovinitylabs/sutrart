@@ -3,7 +3,9 @@ export { PARI_BRAND, type PariBrand } from "./brand.js";
 export { defaultChain, getDefaultChain, supportedChains, type SupportedChain } from "./chains.js";
 export {
   getAppUrl,
+  getBaseSepoliaRpcUrl,
   getDefaultChainId,
+  getPublicBaseSepoliaRpcUrl,
   getPublicSepoliaRpcUrl,
   getSepoliaRpcUrl,
   getSignedListingFeedUrl,
@@ -20,6 +22,7 @@ export {
   getDeploymentManifest,
   getDeployments,
   isSupportedDeploymentChain,
+  baseSepoliaDeployment,
   localDeployment,
   sepoliaDeployment,
   supportedDeploymentChainIds,

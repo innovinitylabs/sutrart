@@ -1,6 +1,6 @@
 "use client";
 
-import { sepolia } from "viem/chains";
+import { baseSepolia, sepolia } from "viem/chains";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import {
   PARI_PROTOCOL_VERSION,
@@ -11,7 +11,7 @@ import {
 import { useContractAddresses } from "@/lib/contracts";
 import { Button } from "@/components/ui/button";
 
-const alphaChains = [getDefaultChain(), sepolia] as const;
+const alphaChains = [getDefaultChain(), sepolia, baseSepolia] as const;
 
 export function ChainStatus() {
   const chainId = useChainId();
@@ -21,6 +21,7 @@ export function ChainStatus() {
 
   const chainName = getChainDisplayName(chainId);
   const isSepolia = chainId === sepolia.id;
+  const isBaseSepolia = chainId === baseSepolia.id;
   const walletChainMismatch = isConnected && chain && chain.id !== chainId;
 
   return (
@@ -32,6 +33,7 @@ export function ChainStatus() {
         <span className="text-xs uppercase tracking-wide text-muted-foreground">
           Protocol {PARI_PROTOCOL_VERSION}
           {isSepolia ? " · Sepolia alpha" : null}
+          {isBaseSepolia ? " · Base Sepolia alpha" : null}
         </span>
       </div>
 
