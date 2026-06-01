@@ -4,6 +4,7 @@ export { defaultChain, getDefaultChain, supportedChains, type SupportedChain } f
 export {
   getAppUrl,
   getDefaultChainId,
+  getPublicSepoliaRpcUrl,
   getSepoliaRpcUrl,
   getSignedListingFeedUrl,
   getWalletConnectProjectId,

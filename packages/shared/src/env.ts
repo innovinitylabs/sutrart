@@ -6,7 +6,7 @@ function readPublicEnv(key: string): string | undefined {
 }
 
 export function getWalletConnectProjectId(): string {
-  const projectId = readPublicEnv("NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID");
+  const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 
   if (!projectId) {
     if (process.env.NODE_ENV === "development") {
@@ -41,11 +41,16 @@ export function getSignedListingFeedUrl(): string | undefined {
   return url && url.length > 0 ? url : undefined;
 }
 
+export function getPublicSepoliaRpcUrl(): string | undefined {
+  const url = process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL;
+  return url && url.length > 0 ? url : undefined;
+}
+
 /** Server-side Sepolia RPC for SSR storefront reads. Falls back to viem chain defaults. */
 export function getSepoliaRpcUrl(): string | undefined {
   if (typeof process === "undefined") {
     return undefined;
   }
-  const url = process.env.SEPOLIA_RPC_URL;
+  const url = process.env.SEPOLIA_RPC_URL ?? process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL;
   return url && url.length > 0 ? url : undefined;
 }
