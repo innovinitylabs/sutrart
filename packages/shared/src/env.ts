@@ -54,3 +54,31 @@ export function getSepoliaRpcUrl(): string | undefined {
   const url = process.env.SEPOLIA_RPC_URL ?? process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL;
   return url && url.length > 0 ? url : undefined;
 }
+
+export function getPublicBaseSepoliaRpcUrl(): string | undefined {
+  const url = process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC_URL;
+  return url && url.length > 0 ? url : undefined;
+}
+
+/** Server-side Base Sepolia RPC for SSR storefront reads. Falls back to viem chain defaults. */
+export function getBaseSepoliaRpcUrl(): string | undefined {
+  if (typeof process === "undefined") {
+    return undefined;
+  }
+  const url = process.env.BASE_SEPOLIA_RPC_URL ?? process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC_URL;
+  return url && url.length > 0 ? url : undefined;
+}
+
+export function getPublicMainnetRpcUrl(): string | undefined {
+  const url = process.env.NEXT_PUBLIC_MAINNET_RPC_URL;
+  return url && url.length > 0 ? url : undefined;
+}
+
+/** Server-side mainnet RPC for SSR reads. Falls back to viem chain defaults. */
+export function getMainnetRpcUrl(): string | undefined {
+  if (typeof process === "undefined") {
+    return undefined;
+  }
+  const url = process.env.MAINNET_RPC_URL ?? process.env.NEXT_PUBLIC_MAINNET_RPC_URL;
+  return url && url.length > 0 ? url : undefined;
+}

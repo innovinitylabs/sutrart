@@ -1,0 +1,19 @@
+{
+  "PariMarket": "0x5c68B3FEE6957badfE801d6Ef20571538db79849",
+  "chainId": 84532,
+  "chainName": "base-sepolia",
+  "deployedAt": 1780289494,
+  "facets": {
+    "DiamondCutFacet": "0x17C90Aa8b50b8A98421d505E8128D3028b6E1743",
+    "DiamondLoupeFacet": "0x22D5BA14439d5e1C64482b1164cc717B7CE3C918",
+    "ERC721RTFactoryFacet": "0x5fE09F74223A578525197AD6ca0F7d69EE953e32",
+    "ListingFacet": "0x16692d7bdf42CFbBa19c0B49c74B966Df93c853B",
+    "OwnershipFacet": "0x2F327162b5Dde31A6593FA91547125dde151DbC9",
+    "ProtocolConfigFacet": "0x08CDAe2bCD3902A67def7F90eC0Cf11dFc68c782",
+    "SettlementFacet": "0x6d90343253A57856063968bA016FbFd1843Cd6a2",
+    "SignedListingFacet": "0xfA4832f63Ab138fae6B7598048Aa84513cF4D836",
+    "ViewFacet": "0x9B146C915093C7874D7d2C5D9d5CD17A9d2a3CCf"
+  },
+  "gitCommit": "4214af167bf2b26b299433564463b947c0e53364",
+  "protocolVersion": "v0.1-alpha"
+}

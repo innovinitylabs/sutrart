@@ -1,3 +1,4 @@
+import baseSepoliaDeployments from "./deployments/base-sepolia.json" with { type: "json" };
 import localDeployments from "./deployments/local.json" with { type: "json" };
 import sepoliaDeployments from "./deployments/sepolia.json" with { type: "json" };
 
@@ -28,10 +29,12 @@ export type SupportedDeployment = DeploymentManifest;
 
 export const localDeployment = localDeployments as DeploymentManifest;
 export const sepoliaDeployment = sepoliaDeployments as DeploymentManifest;
+export const baseSepoliaDeployment = baseSepoliaDeployments as DeploymentManifest;
 
 const deploymentsByChainId: Record<number, DeploymentManifest> = {
   [localDeployment.chainId]: localDeployment,
   [sepoliaDeployment.chainId]: sepoliaDeployment,
+  [baseSepoliaDeployment.chainId]: baseSepoliaDeployment,
 };
 
 export const supportedDeploymentChainIds = Object.keys(deploymentsByChainId).map(Number);
@@ -81,6 +84,14 @@ export function getChainDisplayName(chainId: number): string {
 
   if (chainId === 11155111) {
     return "sepolia";
+  }
+
+  if (chainId === 84532) {
+    return "base-sepolia";
+  }
+
+  if (chainId === 1) {
+    return "mainnet";
   }
 
   if (chainId === 31337) {

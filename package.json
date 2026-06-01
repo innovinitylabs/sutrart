@@ -18,7 +18,9 @@
     "contracts:anvil": "pnpm --filter @pari/contracts anvil",
     "contracts:deploy:local": "pnpm contracts:build && pnpm --filter @pari/contracts deploy:local",
     "contracts:deploy:sepolia": "pnpm contracts:build && pnpm --filter @pari/contracts deploy:sepolia",
+    "contracts:deploy:base-sepolia": "pnpm contracts:build && pnpm --filter @pari/contracts deploy:base-sepolia",
     "manifest:validate": "node scripts/validate-deployment-manifest.mjs packages/shared/src/deployments/sepolia.json",
+    "manifest:validate:base-sepolia": "node scripts/validate-deployment-manifest.mjs packages/shared/src/deployments/base-sepolia.json",
     "manifest:validate:local": "node scripts/validate-deployment-manifest.mjs packages/shared/src/deployments/local.json",
     "validate:sepolia": "pnpm --filter @pari/shared --filter @pari/abi --filter @pari/sdk run build && pnpm --filter @pari/sdk validate:sepolia",
     "sdk:test": "pnpm --filter @pari/sdk test"

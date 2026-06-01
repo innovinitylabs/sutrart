@@ -1,9 +1,10 @@
 "use client";
 
-import { sepolia } from "viem/chains";
+import { baseSepolia, sepolia } from "viem/chains";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import {
   PARI_PROTOCOL_VERSION,
+  alphaChains,
   getChainDisplayName,
   getDefaultChain,
   isSupportedDeploymentChain,
@@ -11,7 +12,7 @@ import {
 import { useContractAddresses } from "@/lib/contracts";
 import { Button } from "@/components/ui/button";
 
-const alphaChains = [getDefaultChain(), sepolia] as const;
+const switchableAlphaChains = [getDefaultChain(), ...alphaChains.filter((chain) => chain.id !== getDefaultChain().id)];
 
 export function ChainStatus() {
   const chainId = useChainId();
@@ -21,6 +22,7 @@ export function ChainStatus() {
 
   const chainName = getChainDisplayName(chainId);
   const isSepolia = chainId === sepolia.id;
+  const isBaseSepolia = chainId === baseSepolia.id;
   const walletChainMismatch = isConnected && chain && chain.id !== chainId;
 
   return (
@@ -32,6 +34,7 @@ export function ChainStatus() {
         <span className="text-xs uppercase tracking-wide text-muted-foreground">
           Protocol {PARI_PROTOCOL_VERSION}
           {isSepolia ? " · Sepolia alpha" : null}
+          {isBaseSepolia ? " · Base Sepolia alpha" : null}
         </span>
       </div>
 
@@ -55,7 +58,7 @@ export function ChainStatus() {
             chain to continue.
           </p>
           <div className="flex flex-wrap gap-2">
-            {alphaChains.map((target) => (
+            {switchableAlphaChains.map((target) => (
               <Button
                 key={target.id}
                 type="button"
