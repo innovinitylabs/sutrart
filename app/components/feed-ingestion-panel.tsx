@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   fetchSignedListingFeed,
   importSignedListingFeed,
@@ -28,46 +28,63 @@ export function FeedIngestionPanel({
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [urlErrors, setUrlErrors] = useState<Record<string, string>>({});
+  const onFeedsChangeRef = useRef(onFeedsChange);
+  const lastFeedsSignatureRef = useRef("");
+
+  useEffect(() => {
+    onFeedsChangeRef.current = onFeedsChange;
+  }, [onFeedsChange]);
 
   useEffect(() => {
     setFeedUrls(loadMarketplaceFeedUrls(chainId));
+    lastFeedsSignatureRef.current = "";
   }, [chainId]);
 
-  const refreshRemoteFeeds = useCallback(
-    async (urls: string[]) => {
-      if (urls.length === 0) {
-        onFeedsChange([]);
-        setUrlErrors({});
-        return;
+  const publishFeeds = useCallback((feeds: SignedListingFeedV1[]) => {
+    const signature = feeds
+      .map((feed) => `${feed.chainId}:${feed.market}:${feed.orders.length}`)
+      .join("|");
+
+    if (signature === lastFeedsSignatureRef.current) {
+      return;
+    }
+
+    lastFeedsSignatureRef.current = signature;
+    onFeedsChangeRef.current(feeds);
+  }, []);
+
+  const refreshRemoteFeeds = useCallback(async (urls: string[]) => {
+    if (urls.length === 0) {
+      publishFeeds([]);
+      setUrlErrors({});
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    const feeds: SignedListingFeedV1[] = [];
+    const errors: Record<string, string> = {};
+
+    for (const url of urls) {
+      try {
+        feeds.push(await fetchSignedListingFeed(url));
+      } catch (fetchError) {
+        errors[url] = formatPanelError(fetchError, "Unable to fetch feed.");
       }
+    }
 
-      setIsLoading(true);
-      setError("");
+    setUrlErrors(errors);
+    publishFeeds(feeds);
 
-      const feeds: SignedListingFeedV1[] = [];
-      const errors: Record<string, string> = {};
+    if (feeds.length === 0 && urls.length > 0) {
+      setError("No feeds could be loaded. Check URLs or import JSON manually.");
+    } else {
+      setStatus(`Loaded ${feeds.length} of ${urls.length} feed(s).`);
+    }
 
-      for (const url of urls) {
-        try {
-          feeds.push(await fetchSignedListingFeed(url));
-        } catch (fetchError) {
-          errors[url] = formatPanelError(fetchError, "Unable to fetch feed.");
-        }
-      }
-
-      setUrlErrors(errors);
-      onFeedsChange(feeds);
-
-      if (feeds.length === 0 && urls.length > 0) {
-        setError("No feeds could be loaded. Check URLs or import JSON manually.");
-      } else {
-        setStatus(`Loaded ${feeds.length} of ${urls.length} feed(s).`);
-      }
-
-      setIsLoading(false);
-    },
-    [onFeedsChange]
-  );
+    setIsLoading(false);
+  }, [publishFeeds]);
 
   useEffect(() => {
     void refreshRemoteFeeds(feedUrls);
@@ -108,7 +125,7 @@ export function FeedIngestionPanel({
   function importFeedJson() {
     try {
       const feed = importSignedListingFeed(JSON.parse(importJson));
-      onFeedsChange([feed]);
+      publishFeeds([feed]);
       setImportJson("");
       setError("");
       setStatus("Imported feed JSON for discovery.");
