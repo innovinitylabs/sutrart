@@ -121,6 +121,8 @@ export function MarketplacePanel() {
     }
   }, [address, chainId, importedFeeds, marketAddress, publicClient, remoteFeeds]);
 
+  const listingKeys = listings.map((listing) => getMarketListingKey(listing)).join("|");
+
   const refreshPayoutPreviews = useCallback(async () => {
     if (!publicClient || !marketAddress || listings.length === 0) {
       setPayoutPreviews({});
@@ -150,7 +152,7 @@ export function MarketplacePanel() {
 
     setPayoutPreviews(nextPreviews);
     setPayoutErrors(nextErrors);
-  }, [listings, marketAddress, marketplaceFeeBps, publicClient]);
+  }, [listingKeys, marketAddress, marketplaceFeeBps, publicClient]);
 
   useEffect(() => {
     void refreshListings();
@@ -175,6 +177,25 @@ export function MarketplacePanel() {
       setMarketplaceFeeRecipient(address);
     }
   }, [address, marketplaceFeeRecipient]);
+
+  const handleFeedsChange = useCallback((feeds: SignedListingFeedV1[]) => {
+    setRemoteFeeds(feeds);
+
+    if (feeds.length > 1) {
+      try {
+        setImportedFeeds([mergeSignedFeeds(feeds)]);
+      } catch (error) {
+        console.warn("[pari] mergeSignedFeeds failed in marketplace ingest panel.", {
+          chainId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        setImportedFeeds(feeds);
+      }
+      return;
+    }
+
+    setImportedFeeds(feeds);
+  }, [chainId]);
 
   const displayStatus = txError || status || txStatus;
 
@@ -242,25 +263,7 @@ export function MarketplacePanel() {
       <StatusMessage message={displayStatus} error={discoveryError || undefined} />
 
       {chainId ? (
-        <FeedIngestionPanel
-          chainId={chainId}
-          onFeedsChange={(feeds) => {
-            setRemoteFeeds(feeds);
-            if (feeds.length > 1) {
-              try {
-                setImportedFeeds([mergeSignedFeeds(feeds)]);
-              } catch (error) {
-                console.warn("[pari] mergeSignedFeeds failed in marketplace ingest panel.", {
-                  chainId,
-                  error: error instanceof Error ? error.message : String(error),
-                });
-                setImportedFeeds(feeds);
-              }
-            } else {
-              setImportedFeeds(feeds);
-            }
-          }}
-        />
+        <FeedIngestionPanel chainId={chainId} onFeedsChange={handleFeedsChange} />
       ) : null}
 
       <section className="space-y-3 rounded-lg border border-border p-4">
